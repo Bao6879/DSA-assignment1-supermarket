@@ -18,14 +18,14 @@ public class MainController {
     public ChoiceBox<String> rootChoice;
     public Button rootButton;
 
-    private BaoList baoList;
+    private BaoList baoList=new BaoList();
 
     @FXML
     private void initialize() {
         rootChoice.getItems().addAll("Select One", "Remove", "Search", "Smart Add", "Move To", "Add Floor Areas", "Add Objects With Absolute Path");
         rootChoice.getSelectionModel().selectFirst();
 
-        if (baoList!=null) {
+        if (baoList!=null && baoList.size()>0) {
             BaoNode newNode = baoList.getHead();
             while (newNode != null) {
                 String content = "";
@@ -34,10 +34,6 @@ public class MainController {
                 list.getItems().add(content);
                 newNode = newNode.getNext();
             }
-        }
-        else
-        {
-            baoList=new BaoList();
         }
     }
 
