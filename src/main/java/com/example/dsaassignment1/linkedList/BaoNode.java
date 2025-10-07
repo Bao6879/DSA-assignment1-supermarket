@@ -3,6 +3,7 @@ package com.example.dsaassignment1.linkedList;
 public class BaoNode {
     private BaoNode next;
     private Object content;
+    private BaoList baoList;
     public BaoNode(Object content) {
         setNext(null);
         setContent(content);
@@ -18,5 +19,11 @@ public class BaoNode {
     }
     public void setContent(Object content) {
         this.content = content;
+    }
+    public BaoList getBaoList() {
+        return baoList;
+    }
+    public void setBaoList(BaoList baoList) {
+        this.baoList = baoList;
     }
 }
