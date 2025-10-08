@@ -11,6 +11,7 @@ module com.example.dsaassignment1 {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+    requires annotations;
 
     opens com.example.dsaassignment1 to javafx.fxml;
     exports com.example.dsaassignment1;

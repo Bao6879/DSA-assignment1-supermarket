@@ -3,12 +3,11 @@ package com.example.dsaassignment1;
 import com.example.dsaassignment1.linkedList.BaoList;
 import com.example.dsaassignment1.linkedList.BaoNode;
 import com.example.dsaassignment1.supermarketComponents.FloorArea;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.*;
 import kotlin.ULong;
 
 public class MainController {
@@ -16,25 +15,42 @@ public class MainController {
     public ListView <String> list;
     public TextField rootField;
     public ChoiceBox<String> rootChoice;
-    public Button rootButton;
+    public Button rootButton, backButton;
+    public Label label;
 
-    private BaoList baoList=new BaoList();
+    private BaoList <FloorArea> baoList=new BaoList<>();
+    private BaoList currentList=new BaoList<>();
+    private BaoNode pos;
 
     @FXML
     private void initialize() {
         rootChoice.getItems().addAll("Select One", "Remove", "Search", "Smart Add", "Move To", "Add Floor Areas", "Add Objects With Absolute Path");
         rootChoice.getSelectionModel().selectFirst();
 
-        if (baoList!=null && baoList.size()>0) {
-            BaoNode newNode = baoList.getHead();
-            while (newNode != null) {
+        if (baoList!=null && baoList.getSize()>0) {
+            for (FloorArea floorArea : baoList) {
                 String content = "";
-                content += ((FloorArea) newNode.getContent()).getTitle();
-                content += "\n" + ((FloorArea) newNode.getContent()).getLevel();
+                content += floorArea.getTitle();
+                content += "\n" + floorArea.getLevel();
                 list.getItems().add(content);
-                newNode = newNode.getNext();
             }
         }
+
+        list.setOnMouseClicked(mouseEvent -> {
+            if (list.getSelectionModel().getSelectedItem()!=null) {
+                Object selectedItem = list.getSelectionModel().getSelectedItem();
+                pos=Utilities.constructNode((String) selectedItem);
+                if (pos.getContent().getClass()==FloorArea.class) {
+                    for (FloorArea floorArea : baoList) {
+                        if (floorArea.equals(pos.getContent())) {
+                            currentList=((FloorArea)pos.getContent()).getAisles();
+                        }
+                    }
+                    moveToFloorArea(((FloorArea)pos.getContent()).getTitle());
+                }
+                System.out.println(selectedItem);
+            }
+        });
     }
 
     @FXML
@@ -47,16 +63,39 @@ public class MainController {
             while (handledLength<input.length())
             {
                 newListElement="";
-                floorArea=Utilities.extractElement(input.substring(handledLength, input.length()));
+                floorArea=Utilities.extractElement(input.substring(handledLength));
+
                 title=Utilities.extractAttribute(floorArea);
+                newListElement+="Floor Area: "+title+";                                                                      ";
+                level=Utilities.extractElement(floorArea.substring(title.length()+1));
+                newListElement+="Level: "+level;
 
-                newListElement+=title+"\n";
-                level=Utilities.extractElement(floorArea.substring(title.length(), title.length()));
-                newListElement+=level;
-
-                baoList.addNode(new BaoNode(new FloorArea(title, Integer.parseInt(title))));
+                baoList.addNode(new BaoNode<>(new FloorArea(title, Integer.parseInt(level))));
                 list.getItems().add(newListElement);
                 handledLength+=floorArea.length()+1;
+            }
+        }
+    }
+
+    private void moveToFloorArea(String destination) {
+        label.setText("Floor Area: "+destination);
+        list.getItems().clear();
+        for (Object node: currentList)
+        {
+            list.getItems().add(node.toString());
+        }
+    }
+
+    @FXML
+    private void backAction(ActionEvent event) {
+        if (pos==null)
+            return;
+        if (pos.getContent().getClass()==FloorArea.class) {
+            pos=null;
+            label.setText("Bao's Hypermarket");
+            list.getItems().clear();
+            for (FloorArea floorArea : baoList) {
+                list.getItems().add(floorArea.toString());
             }
         }
     }

@@ -14,7 +14,6 @@ public class MainApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 1080, 720);
         stage.setTitle("Hello!");
         stage.setScene(scene);
-        stage.setFullScreen(true);
         stage.show();
     }
 

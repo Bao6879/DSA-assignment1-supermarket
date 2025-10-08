@@ -1,16 +1,25 @@
 package com.example.dsaassignment1.supermarketComponents;
 
 public class Goods {
-    private String description;
+    private String description, name;
     private double price, weight;
     private int quantity;
     private String imageUrl;
-    public Goods(String description, double price, double weight, int quantity, String imageUrl) {
+    public Goods(String name, String description, double price, double weight, int quantity, String imageUrl) {
+        setName(name);
         setDescription(description);
         setPrice(price);
         setWeight(weight);
         setQuantity(quantity);
         setImageUrl(imageUrl);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

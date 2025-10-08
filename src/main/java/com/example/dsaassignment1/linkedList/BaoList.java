@@ -1,37 +1,52 @@
 package com.example.dsaassignment1.linkedList;
 
-public class BaoList {
-    private BaoNode head;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+
+public class BaoList <E> implements Iterable <E>{
+    private BaoNode <E> head;
+    private int size;
     public BaoList() {
 
     }
-    public BaoNode getHead() {
+    public BaoNode <E> getHead() {
         return head;
     }
-    public void setHead(BaoNode head) {
+    public void setHead(BaoNode <E> head) {
         this.head = head;
     }
-
-    public void addNode(BaoNode node) {
+    public void addNode(BaoNode <E> node) {
         if (head == null) {
             head = node;
             return;
         }
-        BaoNode newNode = head;
+        BaoNode <E> newNode = head;
         while (newNode.getNext() != null) {
             newNode = newNode.getNext();
         }
         newNode.setNext(node);
     }
-
-    public int size() {
-        int size = 0;
-        BaoNode current = head;
+    public int getSize() {
+        return size;
+    }
+    public void setSize(int size) {
+        this.size = size;
+    }
+    public BaoNode <E> searchNode(BaoNode <E> node) {
+        BaoNode <E> current = head;
         while (current != null) {
-            size++;
-            size+=current.getBaoList().size();
+            if (node.equals(current))
+                return current;
             current = current.getNext();
         }
-        return size;
+        return null;
+    }
+    @NotNull
+    @Override
+    public Iterator<E> iterator() {
+        return new BaoIterator <E> (head);
     }
 }
