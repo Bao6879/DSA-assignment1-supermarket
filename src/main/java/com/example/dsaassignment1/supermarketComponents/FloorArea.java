@@ -34,6 +34,10 @@ public class FloorArea extends Components {
         return aisles;
     }
 
+    public void setAisles(BaoList <Aisle> aisles) {
+        this.aisles = aisles;
+    }
+
     public Aisle findAisle(Aisle aisle) {
         for (Aisle a : aisles) {
             if (a == aisle)

@@ -82,10 +82,32 @@ public class MainController {
     }
     private void setUpContextMenu(ContextMenu contextMenu) {
         contextMenu.getItems().clear();
-        contextMenu.getItems().add(new MenuItem("Edit"));
-        contextMenu.getItems().add(new MenuItem("Delete"));
+        MenuItem edit=new MenuItem("Change Attributes to Field Value");
+        edit.setOnAction(event -> {
+            if (table.getSelectionModel().getSelectedItem()==null)
+                return;
+            BaoNode tmp=Utilities.constructNode(table.getSelectionModel().getSelectedItem().toString());
+            FloorArea replaced=getFloorAreaFromString(Utilities.extractElement(rootField.getText()));
+            replaced.setAisles(((FloorArea)tmp.getContent()).getAisles());
+            baoList.searchNode(tmp).setContent(replaced);
+            table.getItems().set(floorAreaNo.getCellData((FloorArea) tmp.getContent())-1, replaced); //0 indexed
+        });
+        contextMenu.getItems().add(edit);
+
+        MenuItem delete=new MenuItem("Delete");
+        delete.setOnAction(event -> {
+            if (table.getSelectionModel().getSelectedItem()!=null)
+                return;
+            BaoNode tmp=Utilities.constructNode(table.getSelectionModel().getSelectedItem().toString());
+            baoList.removeNode(tmp);
+            table.getItems().remove(tmp.getContent());
+        });
+        contextMenu.getItems().add(delete);
+
         MenuItem visit = new MenuItem("Visit");
         visit.setOnAction(event -> {
+            if (table.getSelectionModel().getSelectedItem()==null)
+                return;
             VBox.setVgrow(table, Priority.NEVER);
             table.setPrefWidth(0);
             table.setPrefHeight(0);
@@ -101,6 +123,7 @@ public class MainController {
                 for (FloorArea floorArea : baoList) {
                     if (floorArea.equals(pos.getContent())) {
                         currentList=floorArea.getAisles();
+                        pos.setContent(floorArea);
                         break;
                     }
                 }
@@ -119,18 +142,15 @@ public class MainController {
         if (choice.equals("Add")) {
             if (pos==null) {
                 int handledLength = 0;
-                String floorArea, title, level;
+                String floorArea;
                 while (handledLength < input.length()) {
                     floorArea = Utilities.extractElement(input.substring(handledLength));
+                    handledLength += floorArea.length() + 1;
 
-                    title = Utilities.extractAttribute(floorArea);
-                    level = Utilities.extractElement(floorArea.substring(title.length() + 1));
-
-                    FloorArea temp = new FloorArea(title.trim(), Integer.parseInt(level.trim()));
+                    floorArea=floorArea.trim();
+                    FloorArea temp=getFloorAreaFromString(floorArea);
                     baoList.addNode(new BaoNode<>(temp));
                     table.getItems().add(temp);
-
-                    handledLength += floorArea.length() + 1;
                 }
             }
             else if (pos.getContent().getClass()==FloorArea.class) {
@@ -159,6 +179,14 @@ public class MainController {
                 }
             }
         }
+    }
+
+    private FloorArea getFloorAreaFromString(String floorArea) {
+        String title, level;
+        title = Utilities.extractAttribute(floorArea);
+        level = Utilities.extractElement(floorArea.substring(title.length() + 1));
+
+        return new FloorArea(title.trim(), Integer.parseInt(level.trim()));
     }
 
     private void moveToFloorArea(String destination) {
