@@ -5,7 +5,8 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -57,7 +58,7 @@
       </HBox>
    </top>
    <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+      <VBox fx:id="vBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
             <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="862.0">
                <children>
@@ -83,7 +84,22 @@
                   </HBox>
                </children>
             </HBox>
-            <ListView fx:id="list" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="349.0" prefWidth="862.0" VBox.vgrow="ALWAYS" />
+            <TableView fx:id="aisleTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" VBox.vgrow="NEVER">
+              <columns>
+                <TableColumn fx:id="aisleNo" prefWidth="47.199980556964874" text="No." />
+                <TableColumn fx:id="aisleName" prefWidth="282.4000015258789" text="Name" />
+                  <TableColumn fx:id="aisleWidth" prefWidth="135.19998168945312" text="Width" />
+                  <TableColumn fx:id="aisleLength" prefWidth="136.79998779296875" text="Length" />
+                  <TableColumn fx:id="aisleTemperature" prefWidth="261.60003662109375" text="Temperature" />
+              </columns>
+            </TableView>
+            <TableView fx:id="table" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="347.0" prefWidth="862.0" VBox.vgrow="ALWAYS">
+              <columns>
+                <TableColumn fx:id="floorAreaNo" prefWidth="75.0" text="No." />
+                <TableColumn fx:id="floorAreaTitle" prefWidth="594.3999404907227" text="Title" />
+                  <TableColumn fx:id="floorAreaLevel" minWidth="0.0" prefWidth="187.99993896484375" text="Level" />
+              </columns>
+            </TableView>
          </children>
       </VBox>
    </center>

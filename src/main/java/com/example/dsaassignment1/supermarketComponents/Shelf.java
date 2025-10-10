@@ -7,6 +7,7 @@ public class Shelf extends Components {
     private BaoList <Goods> goods;
     public Shelf(int number) {
         setNumber(number);
+        goods = new BaoList<>();
     }
     public int getNumber() {
         return number;

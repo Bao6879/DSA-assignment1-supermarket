@@ -14,6 +14,7 @@ module com.example.dsaassignment1 {
     requires annotations;
 
     opens com.example.dsaassignment1 to javafx.fxml;
+    exports com.example.dsaassignment1.supermarketComponents;
     exports com.example.dsaassignment1;
     exports com.example.dsaassignment1.linkedList;
     opens com.example.dsaassignment1.linkedList to javafx.fxml;

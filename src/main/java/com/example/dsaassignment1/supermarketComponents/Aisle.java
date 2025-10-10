@@ -11,6 +11,7 @@ public class Aisle extends Components{
         setLength(length);
         setWidth(width);
         setTemperature(temperature);
+        shelves = new BaoList<>();
     }
 
     public String getName() {

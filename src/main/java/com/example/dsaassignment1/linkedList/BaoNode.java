@@ -1,10 +1,13 @@
 package com.example.dsaassignment1.linkedList;
 
+import java.util.Objects;
+
 public class BaoNode <E> {
-    private BaoNode <E> next;
+    private BaoNode <E> next, prev;
     private int depth;
     private E content;
     public BaoNode(E content) {
+        setPrev(null);
         setNext(null);
         setContent(content);
     }
@@ -13,6 +16,12 @@ public class BaoNode <E> {
     }
     public void setNext(BaoNode <E> next) {
         this.next = next;
+    }
+    public BaoNode <E> getPrev() {
+        return prev;
+    }
+    public void setPrev(BaoNode <E> prev) {
+        this.prev = prev;
     }
     public E getContent() {
         return content;

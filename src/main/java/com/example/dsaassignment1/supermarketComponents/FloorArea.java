@@ -2,6 +2,8 @@ package com.example.dsaassignment1.supermarketComponents;
 
 import com.example.dsaassignment1.linkedList.BaoList;
 
+import java.util.Objects;
+
 public class FloorArea extends Components {
     private String title;
     private int level;
@@ -9,6 +11,7 @@ public class FloorArea extends Components {
     public FloorArea(String title, int level) {
         setTitle(title);
         setLevel(level);
+        aisles = new BaoList<>();
     }
 
     public String getTitle() {
@@ -51,5 +54,13 @@ public class FloorArea extends Components {
     @Override
     public String toString() {
         return "Floor Area: "+title+"; Level: "+level;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FloorArea floorArea = (FloorArea) o;
+        return level == floorArea.level && Objects.equals(title, floorArea.title);
     }
 }

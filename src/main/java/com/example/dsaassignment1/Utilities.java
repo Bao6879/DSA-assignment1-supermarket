@@ -15,7 +15,7 @@ public class Utilities {
             temp+=s.charAt(i);
             i++;
         }
-        return temp.trim();
+        return temp;
     }
 
     public static String extractAttribute(String s)
@@ -29,7 +29,7 @@ public class Utilities {
             temp+=s.charAt(i);
             i++;
         }
-        return temp.trim();
+        return temp;
     }
 
     public static BaoNode constructNode(String s)
@@ -38,7 +38,7 @@ public class Utilities {
         {
             BaoNode <FloorArea> baoNode;
             String title=extractElement(s.substring(12));
-            int level=Integer.parseInt(extractElement(s.substring(12+title.length()+1)).substring(7));
+            int level=Integer.parseInt(extractElement(s.substring(12+title.length()+1)).substring(7).trim());
             baoNode=new BaoNode<>(new FloorArea(title,level));
             return baoNode;
         }
