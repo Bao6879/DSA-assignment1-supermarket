@@ -92,6 +92,7 @@ public class MainController {
             int index=shelfTable.getItems().indexOf(cellData.getValue())+1;
             return new SimpleIntegerProperty(index).asObject();
         });
+        setUpShelfContextMenu(shelfContextMenu);
     }
 
     private void goodsInitialization()
@@ -101,11 +102,12 @@ public class MainController {
         goodsPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
         goodsWeight.setCellValueFactory(new PropertyValueFactory<>("weight"));
         goodsDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
-        goodsImage.setCellValueFactory(new PropertyValueFactory<>("image"));
+        goodsImage.setCellValueFactory(new PropertyValueFactory<>("imageUrl"));
         goodsNo.setCellValueFactory(cellData -> {
             int index=goodsTable.getItems().indexOf(cellData.getValue())+1;
             return new SimpleIntegerProperty(index).asObject();
         });
+        setUpGoodsContextMenu(goodsContextMenu);
     }
 
     private void setUpFloorAreaContextMenu(ContextMenu contextMenu) {
@@ -126,6 +128,25 @@ public class MainController {
         aisleTable.setContextMenu(contextMenu);
     }
 
+    public void setUpShelfContextMenu(ContextMenu contextMenu)
+    {
+        contextMenu.getItems().clear();
+        contextMenu.getItems().add(createEditMenuItem(shelfTable, shelfNo));
+        contextMenu.getItems().add(createDeleteMenuItem(shelfTable));
+        contextMenu.getItems().add(createVisitMenuItem(shelfTable, goodsTable));
+        contextMenu.getItems().add(new MenuItem("More"));
+        shelfTable.setContextMenu(contextMenu);
+    }
+
+    public void setUpGoodsContextMenu(ContextMenu contextMenu)
+    {
+        contextMenu.getItems().clear();
+        contextMenu.getItems().add(createEditMenuItem(goodsTable, goodsNo));
+        contextMenu.getItems().add(createDeleteMenuItem(goodsTable));
+        contextMenu.getItems().add(new MenuItem("More"));
+        goodsTable.setContextMenu(contextMenu);
+    }
+
     @FXML
     private void rootAction(ActionEvent event) {
         String choice=rootChoice.getSelectionModel().getSelectedItem();
@@ -142,7 +163,7 @@ public class MainController {
                     handledLength += floorArea.length() + 1;
                 }
             }
-            else if (pos.getContent().getClass()==FloorArea.class) {
+            else if (pos.getContent() instanceof FloorArea) {
                 int handledLength = 0;
                 String aisle;
                 while (handledLength < input.length()) {
@@ -153,7 +174,7 @@ public class MainController {
                     handledLength += aisle.length() + 1;
                 }
             }
-            else if (pos.getContent().getClass()==Aisle.class) {
+            else if (pos.getContent() instanceof Aisle) {
                 int handledLength = 0;
                 String shelf;
                 while (handledLength < input.length()) {
@@ -219,11 +240,11 @@ public class MainController {
             if (tmp.getContent() instanceof FloorArea)
                 baoList.removeNode(tmp);
             else if (tmp.getContent() instanceof Aisle)
-                ((FloorArea)(findNodeByPath(currentPath.subList(0, 0), currentPath.getNode(0)).getContent())).getInnerList().removeNode(tmp);
+                ((FloorArea)(findNodeByPath(currentPath, currentPath.getNode(0)).getContent())).getInnerList().removeNode(tmp);
             else if (tmp.getContent() instanceof Shelf)
-                ((Aisle)(findNodeByPath(currentPath.subList(0, 1), currentPath.getNode(1)).getContent())).getInnerList().removeNode(tmp);
+                ((Aisle)(findNodeByPath(currentPath, currentPath.getNode(1)).getContent())).getInnerList().removeNode(tmp);
             else
-                ((Shelf)(findNodeByPath(currentPath.subList(0, 2), currentPath.getNode(2)).getContent())).getInnerList().removeNode(tmp);
+                ((Shelf)(findNodeByPath(currentPath, currentPath.getNode(2)).getContent())).getInnerList().removeNode(tmp);
             tableView.getItems().remove(tmp.getContent());
         });
         return delete;
@@ -253,6 +274,8 @@ public class MainController {
                     moveToFloorArea(((FloorArea)pos.getContent()).getTitle());
                 else if (pos.getContent() instanceof Aisle)
                     moveToAisle(((Aisle)pos.getContent()).getName());
+                else if (pos.getContent() instanceof Shelf)
+                    moveToShelf(String.valueOf(((Shelf)pos.getContent()).getNumber()));
             }
         });
         return visit;
@@ -295,7 +318,29 @@ public class MainController {
 
     private Goods getGoodFromString(String goods)
     {
-        return null;
+        String name, description, weight, price, quantity, temperature, image;
+        int currentPosition=0;
+        name = Utilities.extractAttribute(goods);
+        currentPosition+=name.length()+1;
+
+        description=Utilities.extractAttribute(goods.substring(currentPosition));
+        currentPosition+=description.length()+1;
+
+        weight=Utilities.extractAttribute(goods.substring(currentPosition));
+        currentPosition+=weight.length()+1;
+
+        price=Utilities.extractAttribute(goods.substring(currentPosition));
+        currentPosition+=price.length()+1;
+
+        quantity=Utilities.extractAttribute(goods.substring(currentPosition));
+        currentPosition+=quantity.length()+1;
+
+        temperature=Utilities.extractAttribute(goods.substring(currentPosition));
+        currentPosition+=temperature.length()+1;
+
+        image=Utilities.extractElement(goods.substring(currentPosition));
+
+        return new Goods(name.trim(), description.trim(), Double.parseDouble(weight.trim()), Double.parseDouble(price.trim()), Integer.parseInt(quantity.trim()), Double.parseDouble(temperature.trim()), image.trim());
     }
 
     ///MOVEMENT TO COMPONENTS
@@ -303,31 +348,33 @@ public class MainController {
         label.setText("Floor Area: "+destination);
         aisleTable.getItems().clear();
         for (Object node: currentList)
-        {
             aisleTable.getItems().add((Aisle)(node));
-        }
     }
 
     private void moveToAisle(String destination) {
         label.setText("Aisle: "+destination);
         shelfTable.getItems().clear();
         for (Object node: currentList)
-        {
             shelfTable.getItems().add((Shelf) (node));
-        }
+    }
+
+    private void moveToShelf(String destination) {
+        label.setText("Shelf: "+destination);
+        goodsTable.getItems().clear();
+        for (Object node: currentList)
+            goodsTable.getItems().add((Goods) (node));
     }
 
     @FXML
     private void backAction(ActionEvent event) {
         if (pos==null)
             return;
-        if (pos.getContent().getClass()==FloorArea.class) {
+        if (pos.getContent() instanceof FloorArea) {
             pos=null;
             label.setText("Bao's Hypermarket");
             floorAreaTable.getItems().clear();
-            for (FloorArea floorArea : baoList) {
+            for (FloorArea floorArea : baoList)
                 floorAreaTable.getItems().add(floorArea);
-            }
 
             VBox.setVgrow(aisleTable, Priority.NEVER);
             aisleTable.setPrefWidth(0);
@@ -337,15 +384,14 @@ public class MainController {
             floorAreaTable.setPrefWidth(100);
             floorAreaTable.setPrefHeight(100);
         }
-        else if (pos.getContent().getClass()==Aisle.class) {
-            pos=currentPath.getNode(0);
+        else if (pos.getContent() instanceof Aisle) {
+            pos=new BaoNode(currentPath.getNode(0).getContent());
 
             currentList.clear();
-            for (Object aisle: ((FloorArea)(baoList.searchNode(pos).getContent())).getInnerList())
-            {
+            for (Object aisle: ((Components)(findNodeByPath(currentPath.subList(0), currentPath.getNode(0)).getContent())).getInnerList())
                 currentList.addNode(new BaoNode<>((Aisle)(aisle)));
-            }
             moveToFloorArea(((FloorArea)pos.getContent()).getTitle());
+
             VBox.setVgrow(shelfTable, Priority.NEVER);
             shelfTable.setPrefWidth(0);
             shelfTable.setPrefHeight(0);
@@ -353,6 +399,23 @@ public class MainController {
             VBox.setVgrow(aisleTable, Priority.ALWAYS);
             aisleTable.setPrefWidth(100);
             aisleTable.setPrefHeight(100);
+        }
+        else if (pos.getContent() instanceof Shelf)
+        {
+            pos=new BaoNode(currentPath.getNode(1).getContent());
+
+            currentList.clear();
+            for (Object shelf: ((Components)(findNodeByPath(currentPath.subList(1), currentPath.getNode(1)).getContent())).getInnerList())
+                currentList.addNode(new BaoNode<>((Shelf)(shelf)));
+            moveToAisle(((Aisle)pos.getContent()).getName());
+
+            VBox.setVgrow(goodsTable, Priority.NEVER);
+            goodsTable.setPrefWidth(0);
+            goodsTable.setPrefHeight(0);
+
+            VBox.setVgrow(shelfTable, Priority.ALWAYS);
+            shelfTable.setPrefWidth(100);
+            shelfTable.setPrefHeight(100);
         }
         currentPath.removeNode(currentPath.getNode(currentPath.getSize()-1));
     }
@@ -364,10 +427,9 @@ public class MainController {
             return null;
         switch (path.getSize())
         {
-            case 0, 1: return baoList.searchNode((BaoNode<FloorArea>) node);
+            case 1: return baoList.searchNode((BaoNode<FloorArea>) node);
             case 2: return baoList.searchNode((BaoNode<FloorArea>) path.getNode(0)).getContent().getInnerList().searchNode((BaoNode<Aisle>) node);
             case 3: return baoList.searchNode((BaoNode<FloorArea>) path.getNode(0)).getContent().getInnerList().searchNode((BaoNode<Aisle>) path.getNode(1)).getContent().getInnerList().searchNode((BaoNode<Shelf>) node);
-            case 4: return baoList.searchNode((BaoNode<FloorArea>) path.getNode(0)).getContent().getInnerList().searchNode((BaoNode<Aisle>) path.getNode(1)).getContent().getInnerList().searchNode((BaoNode<Shelf>) path.getNode(2)).getContent().getInnerList().searchNode((BaoNode<Goods>) node);
             default: return null;
         }
     }

@@ -2,17 +2,20 @@ package main.supermarketComponents;
 
 import main.linkedList.BaoList;
 
+import java.util.Objects;
+
 public class Goods extends Components {
     private String description, name;
-    private double price, weight;
+    private double price, weight, temperature;
     private int quantity;
     private String imageUrl;
-    public Goods(String name, String description, double price, double weight, int quantity, String imageUrl) {
+    public Goods(String name, String description, double weight, double price, int quantity, double temperature, String imageUrl) {
         setName(name);
         setDescription(description);
         setPrice(price);
         setWeight(weight);
         setQuantity(quantity);
+        setTemperature(temperature);
         setImageUrl(imageUrl);
     }
 
@@ -56,6 +59,14 @@ public class Goods extends Components {
         this.quantity = quantity;
     }
 
+    public double getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(double temperature) {
+        this.temperature = temperature;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -65,13 +76,21 @@ public class Goods extends Components {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Goods goods = (Goods) o;
+        return Double.compare(price, goods.price) == 0 && Double.compare(weight, goods.weight) == 0 && Double.compare(temperature, goods.temperature) == 0 && quantity == goods.quantity && Objects.equals(description, goods.description) && Objects.equals(name, goods.name) && Objects.equals(imageUrl, goods.imageUrl);
+    }
+
+    @Override
     public int getTotalSize() {
         return 1;
     }
 
     @Override
     public String toString() {
-        return "";
+        return "Goods: "+name+"; Description: "+description+"; Weight: "+weight+"; Price: "+price+"; Quantity: "+quantity+"; Temperature: "+temperature+"; Image: "+imageUrl;
     }
 
     @Override

@@ -16,8 +16,9 @@ public class BaoList <E> implements Iterable <E>{
     public void setHead(BaoNode <E> head) {
         this.head = head;
     }
-    public void addNode(BaoNode <E> node) {
+    public void addNode(BaoNode <E> node1) {
         size++;
+        BaoNode <E> node=new BaoNode<>(node1.getContent());
         if (head == null) {
             head = node;
             return;
@@ -49,11 +50,15 @@ public class BaoList <E> implements Iterable <E>{
         delNode.setPrev(null);
         size--;
     }
-    public BaoList <E> subList(int start, int end) {
+    public BaoList <E> subList(int end) {
         BaoList <E> subList = new BaoList();
-        BaoNode <E> subHead = head;
-        for (int i = start; i <= end; i++)
-            subList.addNode(subHead);
+        BaoNode <E> current=head;
+        int index=0;
+        while (index <= end) {
+            subList.addNode(current);
+            current = current.getNext();
+            index++;
+        }
         return subList;
     }
     public void clear()

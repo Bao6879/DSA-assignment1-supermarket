@@ -2,10 +2,7 @@ package main;
 
 import main.linkedList.BaoList;
 import main.linkedList.BaoNode;
-import main.supermarketComponents.Aisle;
-import main.supermarketComponents.Components;
-import main.supermarketComponents.FloorArea;
-import main.supermarketComponents.Shelf;
+import main.supermarketComponents.*;
 
 public class Utilities {
     public static String extractElement(String s)
@@ -64,7 +61,32 @@ public class Utilities {
         {
             return new BaoNode<>(new Shelf(Integer.parseInt(extractElement(s.substring(7)).trim())));
         }
-        return null;
+        else
+        {
+            String name, description, weight, price, quantity, temperature, image;
+            int currentPosition=6;
+            name = Utilities.extractElement(s.substring(currentPosition));
+            currentPosition+=name.length()+14;
+
+            description=Utilities.extractElement(s.substring(currentPosition));
+            currentPosition+=description.length()+9;
+
+            weight=Utilities.extractElement(s.substring(currentPosition));
+            currentPosition+=weight.length()+8;
+
+            price=Utilities.extractElement(s.substring(currentPosition));
+            currentPosition+=price.length()+11;
+
+            quantity=Utilities.extractElement(s.substring(currentPosition));
+            currentPosition+=quantity.length()+15;
+
+            temperature=Utilities.extractElement(s.substring(currentPosition));
+            currentPosition+=temperature.length()+8;
+
+            image=Utilities.extractElement(s.substring(currentPosition));
+
+            return new BaoNode<>(new Goods(name.trim(), description.trim(), Double.parseDouble(weight.trim()), Double.parseDouble(price.trim()), Integer.parseInt(quantity.trim()), Double.parseDouble(temperature.trim()), image.trim()));
+        }
     }
 
     public static BaoList copyList(BaoList list)
