@@ -1,8 +1,7 @@
 package main.supermarketComponents;
 
+import main.Utilities;
 import main.linkedList.BaoList;
-
-import java.util.Objects;
 
 public class Shelf extends Components {
     private int number;
@@ -17,11 +16,14 @@ public class Shelf extends Components {
     public void setNumber(int number) {
         this.number = number;
     }
-    public BaoList <Goods> getGoods() {
+    @Override
+    public BaoList <Goods> getInnerList() {
         return goods;
     }
-    public void setGoods(BaoList <Goods> goods) {
-        this.goods = goods;
+    @Override
+    public void setInnerList(BaoList <?> goods) {
+        if (goods!=null && goods.getHead()!=null && goods.getHead().getContent() instanceof Goods)
+            this.goods = Utilities.copyList(goods);
     }
     @Override
     public int getTotalSize() {

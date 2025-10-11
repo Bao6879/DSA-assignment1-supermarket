@@ -1,6 +1,8 @@
 package main.supermarketComponents;
 
-public class Goods {
+import main.linkedList.BaoList;
+
+public class Goods extends Components {
     private String description, name;
     private double price, weight;
     private int quantity;
@@ -60,5 +62,25 @@ public class Goods {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public int getTotalSize() {
+        return 1;
+    }
+
+    @Override
+    public String toString() {
+        return "";
+    }
+
+    @Override
+    public BaoList getInnerList() {
+        return null;
+    }
+
+    @Override
+    public void setInnerList(BaoList<?> innerList) {
+
     }
 }

@@ -1,5 +1,6 @@
 package main.supermarketComponents;
 
+import main.Utilities;
 import main.linkedList.BaoList;
 
 import java.util.Objects;
@@ -30,12 +31,15 @@ public class FloorArea extends Components {
         this.level = level;
     }
 
-    public BaoList <Aisle> getAisles() {
+    @Override
+    public BaoList <Aisle> getInnerList() {
         return aisles;
     }
 
-    public void setAisles(BaoList <Aisle> aisles) {
-        this.aisles = aisles;
+    @Override
+    public void setInnerList(BaoList <?> aisles) {
+        if (aisles!=null && aisles.getHead()!=null && aisles.getHead().getContent() instanceof Aisle)
+            this.aisles = Utilities.copyList(aisles);
     }
 
     public Aisle findAisle(Aisle aisle) {

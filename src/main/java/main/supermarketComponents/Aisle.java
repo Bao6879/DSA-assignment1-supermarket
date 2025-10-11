@@ -1,5 +1,6 @@
 package main.supermarketComponents;
 
+import main.Utilities;
 import main.linkedList.BaoList;
 
 import java.util.Objects;
@@ -48,12 +49,15 @@ public class Aisle extends Components{
         this.temperature = temperature;
     }
 
-    public BaoList <Shelf> getShelves() {
+    @Override
+    public BaoList <Shelf> getInnerList() {
         return shelves;
     }
 
-    public void setShelves(BaoList <Shelf> shelves) {
-        this.shelves = shelves;
+    @Override
+    public void setInnerList(BaoList <?> shelves) {
+        if (shelves!=null && shelves.getHead()!=null && shelves.getHead().getContent() instanceof Shelf)
+            this.shelves = Utilities.copyList(shelves);
     }
 
     @Override

@@ -2,10 +2,7 @@ package main;
 
 import main.linkedList.BaoList;
 import main.linkedList.BaoNode;
-import main.supermarketComponents.Aisle;
-import main.supermarketComponents.FloorArea;
-import main.supermarketComponents.Goods;
-import main.supermarketComponents.Shelf;
+import main.supermarketComponents.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -113,113 +110,18 @@ public class MainController {
 
     private void setUpFloorAreaContextMenu(ContextMenu contextMenu) {
         contextMenu.getItems().clear();
-        MenuItem edit=new MenuItem("Change Attributes to Field Value");
-        edit.setOnAction(event -> {
-            if (floorAreaTable.getSelectionModel().getSelectedItem()==null)
-                return;
-            BaoNode tmp=Utilities.constructNode(floorAreaTable.getSelectionModel().getSelectedItem().toString());
-            FloorArea replaced=getFloorAreaFromString(Utilities.extractElement(rootField.getText()));
-            replaced.setAisles(((FloorArea)tmp.getContent()).getAisles());
-            baoList.searchNode(tmp).setContent(replaced);
-            floorAreaTable.getItems().set(floorAreaNo.getCellData((FloorArea) tmp.getContent())-1, replaced); //0 indexed
-        });
-        contextMenu.getItems().add(edit);
-
-        MenuItem delete=new MenuItem("Delete");
-        delete.setOnAction(event -> {
-            if (floorAreaTable.getSelectionModel().getSelectedItem()==null)
-                return;
-            BaoNode tmp=Utilities.constructNode(floorAreaTable.getSelectionModel().getSelectedItem().toString());
-            baoList.removeNode(tmp);
-            floorAreaTable.getItems().remove(tmp.getContent());
-        });
-        contextMenu.getItems().add(delete);
-
-        MenuItem visit = new MenuItem("Visit");
-        visit.setOnAction(event -> {
-            if (floorAreaTable.getSelectionModel().getSelectedItem()==null)
-                return;
-            VBox.setVgrow(floorAreaTable, Priority.NEVER);
-            floorAreaTable.setPrefWidth(0);
-            floorAreaTable.setPrefHeight(0);
-
-            VBox.setVgrow(aisleTable, Priority.ALWAYS);
-            aisleTable.setPrefWidth(100);
-            aisleTable.setPrefHeight(100);
-
-            pos=Utilities.constructNode(floorAreaTable.getSelectionModel().getSelectedItem().toString());
-            if (pos!=null) {
-                for (FloorArea floorArea : baoList) {
-                    if (floorArea.equals(pos.getContent())) {
-                        currentList=Utilities.copyList(floorArea.getAisles());
-                        pos.setContent(floorArea);
-                        break;
-                    }
-                }
-                currentPath.addNode(pos);
-                moveToFloorArea(((FloorArea)pos.getContent()).getTitle());
-            }
-        });
-        contextMenu.getItems().add(visit);
+        contextMenu.getItems().add(createEditMenuItem(floorAreaTable, floorAreaNo));
+        contextMenu.getItems().add(createDeleteMenuItem(floorAreaTable));
+        contextMenu.getItems().add(createVisitMenuItem(floorAreaTable, aisleTable));
         contextMenu.getItems().add(new MenuItem("More"));
         floorAreaTable.setContextMenu(contextMenu);
     }
 
     public void setUpAisleContextMenu(ContextMenu contextMenu) {
         contextMenu.getItems().clear();
-        MenuItem edit=new MenuItem("Change Attributes to Field Value");
-        edit.setOnAction(event -> {
-            if (aisleTable.getSelectionModel().getSelectedItem()==null)
-                return;
-            BaoNode tmp=Utilities.constructNode(aisleTable.getSelectionModel().getSelectedItem().toString());
-            Aisle replaced=getAisleFromString(Utilities.extractElement(rootField.getText()));
-            replaced.setShelves(((Aisle)tmp.getContent()).getShelves());
-            baoList.searchNode(tmp).setContent(replaced);
-            aisleTable.getItems().set(aisleNo.getCellData((Aisle) tmp.getContent())-1, replaced); //0 indexed
-        });
-        contextMenu.getItems().add(edit);
-
-        MenuItem delete=new MenuItem("Delete");
-        delete.setOnAction(event -> {
-            if (aisleTable.getSelectionModel().getSelectedItem()==null)
-                return;
-            BaoNode tmp=Utilities.constructNode(aisleTable.getSelectionModel().getSelectedItem().toString());
-            baoList.removeNode(tmp);
-            aisleTable.getItems().remove(tmp.getContent());
-        });
-        contextMenu.getItems().add(delete);
-
-        MenuItem visit = new MenuItem("Visit");
-        visit.setOnAction(event -> {
-            if (aisleTable.getSelectionModel().getSelectedItem()==null)
-                return;
-            VBox.setVgrow(aisleTable, Priority.NEVER);
-            aisleTable.setPrefWidth(0);
-            aisleTable.setPrefHeight(0);
-
-            VBox.setVgrow(shelfTable, Priority.ALWAYS);
-            shelfTable.setPrefWidth(100);
-            shelfTable.setPrefHeight(100);
-
-            pos=Utilities.constructNode(aisleTable.getSelectionModel().getSelectedItem().toString());
-            if (pos!=null) {
-                for (FloorArea floorArea : baoList) {
-                    if (floorArea.equals(currentPath.getNode(0).getContent())) {
-                        for (Aisle aisle: floorArea.getAisles())
-                        {
-                            if (aisle.equals(pos.getContent())) {
-                                currentList=Utilities.copyList(aisle.getShelves());
-                                pos.setContent(aisle);
-                                break;
-                            }
-                        }
-                    }
-                }
-                currentPath.addNode(pos);
-                moveToAisle(((Aisle)pos.getContent()).getName());
-            }
-        });
-        contextMenu.getItems().add(visit);
+        contextMenu.getItems().add(createEditMenuItem(aisleTable, aisleNo));
+        contextMenu.getItems().add(createDeleteMenuItem(aisleTable));
+        contextMenu.getItems().add(createVisitMenuItem(aisleTable, shelfTable));
         contextMenu.getItems().add(new MenuItem("More"));
         aisleTable.setContextMenu(contextMenu);
     }
@@ -234,12 +136,10 @@ public class MainController {
                 String floorArea;
                 while (handledLength < input.length()) {
                     floorArea = Utilities.extractElement(input.substring(handledLength));
-                    handledLength += floorArea.length() + 1;
-
-                    floorArea=floorArea.trim();
-                    FloorArea temp=getFloorAreaFromString(floorArea);
+                    FloorArea temp=getFloorAreaFromString(floorArea.trim());
                     baoList.addNode(new BaoNode<>(temp));
                     floorAreaTable.getItems().add(temp);
+                    handledLength += floorArea.length() + 1;
                 }
             }
             else if (pos.getContent().getClass()==FloorArea.class) {
@@ -247,11 +147,9 @@ public class MainController {
                 String aisle;
                 while (handledLength < input.length()) {
                     aisle = Utilities.extractElement(input.substring(handledLength));
-
-                    Aisle temp=getAisleFromString(aisle);
-                    ((FloorArea)(baoList.searchNode(pos).getContent())).getAisles().addNode(new BaoNode<>(temp));
+                    Aisle temp=getAisleFromString(aisle.trim());
+                    ((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList().addNode(new BaoNode<>(temp));
                     aisleTable.getItems().add(temp);
-
                     handledLength += aisle.length() + 1;
                 }
             }
@@ -260,17 +158,107 @@ public class MainController {
                 String shelf;
                 while (handledLength < input.length()) {
                     shelf = Utilities.extractElement(input.substring(handledLength));
-
                     Shelf temp=getShelfFromString(shelf);
-                    ((Aisle)(((FloorArea)(baoList.searchNode(currentPath.getNode(0)).getContent())).getAisles().searchNode(currentPath.getNode(currentPath.getSize()-1)).getContent())).getShelves().addNode(new BaoNode<>(temp));
+                    ((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList().addNode(new BaoNode<>(temp));
                     shelfTable.getItems().add(temp);
-
                     handledLength += shelf.length() + 1;
+                }
+            }
+            else
+            {
+                int handledLength = 0;
+                String goods;
+                while (handledLength < input.length()) {
+                    goods = Utilities.extractElement(input.substring(handledLength));
+                    Goods temp=getGoodFromString(goods);
+                    ((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList().addNode(new BaoNode<>(temp));
+                    goodsTable.getItems().add(temp);
+                    handledLength += goods.length() + 1;
                 }
             }
         }
     }
 
+    ///MENU ITEMS
+    private MenuItem createEditMenuItem(TableView <?> tableView, TableColumn <?, ?> noColumn)
+    {
+        MenuItem edit=new MenuItem("Change Attributes to Field Value");
+        edit.setOnAction(event -> {
+            if (tableView.getSelectionModel().getSelectedItem()==null)
+                return;
+            BaoNode tmp=Utilities.constructNode(tableView.getSelectionModel().getSelectedItem().toString());
+            Object replaced;
+            if (tmp.getContent() instanceof FloorArea)
+                replaced = getFloorAreaFromString(Utilities.extractElement(rootField.getText()));
+            else if (tmp.getContent() instanceof Aisle)
+                replaced = getAisleFromString(Utilities.extractElement(rootField.getText()));
+            else if (tmp.getContent() instanceof Shelf)
+                replaced = getShelfFromString(Utilities.extractElement(rootField.getText()));
+            else
+                replaced = getGoodFromString(Utilities.extractElement(rootField.getText()));
+            if (currentPath.getSize()>=1) {
+                ((Components) replaced).setInnerList(((Components)(((Components) findNodeByPath(currentPath, currentPath.getNode(currentPath.getSize()-1)).getContent()).getInnerList().searchNode(tmp).getContent())).getInnerList());
+                ((BaoNode<Components>) (findNodeByPath(currentPath, currentPath.getNode(currentPath.getSize()-1)))).getContent().getInnerList().searchNode(tmp).setContent(replaced);
+            }
+            else {
+                ((Components) replaced).setInnerList(((Components) baoList.searchNode(tmp).getContent()).getInnerList());
+                baoList.searchNode(tmp).setContent(replaced);
+            }
+            ((TableView<Object>)(tableView)).getItems().set(((TableColumn <Components, Integer>)(noColumn)).getCellData((Components) tmp.getContent())-1, replaced); //0 indexed
+        });
+        return edit;
+    }
+
+    private MenuItem createDeleteMenuItem(TableView <?> tableView)
+    {
+        MenuItem delete=new MenuItem("Delete");
+        delete.setOnAction(event -> {
+            if (tableView.getSelectionModel().getSelectedItem()==null)
+                return;
+            BaoNode tmp=Utilities.constructNode(tableView.getSelectionModel().getSelectedItem().toString());
+            if (tmp.getContent() instanceof FloorArea)
+                baoList.removeNode(tmp);
+            else if (tmp.getContent() instanceof Aisle)
+                ((FloorArea)(findNodeByPath(currentPath.subList(0, 0), currentPath.getNode(0)).getContent())).getInnerList().removeNode(tmp);
+            else if (tmp.getContent() instanceof Shelf)
+                ((Aisle)(findNodeByPath(currentPath.subList(0, 1), currentPath.getNode(1)).getContent())).getInnerList().removeNode(tmp);
+            else
+                ((Shelf)(findNodeByPath(currentPath.subList(0, 2), currentPath.getNode(2)).getContent())).getInnerList().removeNode(tmp);
+            tableView.getItems().remove(tmp.getContent());
+        });
+        return delete;
+    }
+
+    private MenuItem createVisitMenuItem(TableView <?> oldTableView, TableView <?> newTableView)
+    {
+        MenuItem visit=new MenuItem("Visit");
+        visit.setOnAction(event -> {
+            if (oldTableView.getSelectionModel().getSelectedItem()==null)
+                return;
+            VBox.setVgrow(oldTableView, Priority.NEVER);
+            oldTableView.setPrefWidth(0);
+            oldTableView.setPrefHeight(0);
+
+            VBox.setVgrow(newTableView, Priority.ALWAYS);
+            newTableView.setPrefWidth(100);
+            newTableView.setPrefHeight(100);
+
+            pos=Utilities.constructNode(oldTableView.getSelectionModel().getSelectedItem().toString());
+            if (pos!=null) {
+                currentPath.addNode(pos);
+                BaoNode tmp=findNodeByPath(currentPath, pos);
+                currentList=Utilities.copyList(((Components)(tmp.getContent())).getInnerList());
+
+                if (pos.getContent() instanceof FloorArea)
+                    moveToFloorArea(((FloorArea)pos.getContent()).getTitle());
+                else if (pos.getContent() instanceof Aisle)
+                    moveToAisle(((Aisle)pos.getContent()).getName());
+            }
+        });
+        return visit;
+    }
+
+    ///INFO EXTRACTION FROM STRINGS
     private FloorArea getFloorAreaFromString(String floorArea) {
         String title, level;
         title = Utilities.extractAttribute(floorArea);
@@ -305,6 +293,12 @@ public class MainController {
         return new Shelf(Integer.parseInt(number.trim()));
     }
 
+    private Goods getGoodFromString(String goods)
+    {
+        return null;
+    }
+
+    ///MOVEMENT TO COMPONENTS
     private void moveToFloorArea(String destination) {
         label.setText("Floor Area: "+destination);
         aisleTable.getItems().clear();
@@ -347,7 +341,7 @@ public class MainController {
             pos=currentPath.getNode(0);
 
             currentList.clear();
-            for (Object aisle: ((FloorArea)(baoList.searchNode(pos).getContent())).getAisles())
+            for (Object aisle: ((FloorArea)(baoList.searchNode(pos).getContent())).getInnerList())
             {
                 currentList.addNode(new BaoNode<>((Aisle)(aisle)));
             }
@@ -361,5 +355,53 @@ public class MainController {
             aisleTable.setPrefHeight(100);
         }
         currentPath.removeNode(currentPath.getNode(currentPath.getSize()-1));
+    }
+
+    ///UTILITIES
+    private BaoNode <?> findNodeByPath(BaoList <?> path, BaoNode <?> node)
+    {
+        if (path==null || node==null)
+            return null;
+        switch (path.getSize())
+        {
+            case 0, 1: return baoList.searchNode((BaoNode<FloorArea>) node);
+            case 2: return baoList.searchNode((BaoNode<FloorArea>) path.getNode(0)).getContent().getInnerList().searchNode((BaoNode<Aisle>) node);
+            case 3: return baoList.searchNode((BaoNode<FloorArea>) path.getNode(0)).getContent().getInnerList().searchNode((BaoNode<Aisle>) path.getNode(1)).getContent().getInnerList().searchNode((BaoNode<Shelf>) node);
+            case 4: return baoList.searchNode((BaoNode<FloorArea>) path.getNode(0)).getContent().getInnerList().searchNode((BaoNode<Aisle>) path.getNode(1)).getContent().getInnerList().searchNode((BaoNode<Shelf>) path.getNode(2)).getContent().getInnerList().searchNode((BaoNode<Goods>) node);
+            default: return null;
+        }
+    }
+
+    private BaoNode <?> fullSearch(BaoNode <?> node)
+    {
+        if (node.getDepth()==0)
+            return baoList.searchNode((BaoNode<FloorArea>) node);
+        for (FloorArea floorArea: baoList)
+        {
+            if (node.getDepth()==1)
+            {
+                BaoNode <Aisle> tmp=floorArea.getInnerList().searchNode((BaoNode<Aisle>) node);
+                if (tmp!=null)
+                    return tmp;
+                continue;
+            }
+            for (Aisle aisle: floorArea.getInnerList())
+            {
+                if (node.getDepth()==2)
+                {
+                    BaoNode <Shelf> tmp=aisle.getInnerList().searchNode((BaoNode<Shelf>) node);
+                    if (tmp!=null)
+                        return tmp;
+                    continue;
+                }
+                for (Shelf shelf: aisle.getInnerList())
+                {
+                    BaoNode <Goods> tmp=shelf.getInnerList().searchNode((BaoNode<Goods>) node);
+                    if (tmp!=null)
+                        return tmp;
+                }
+            }
+        }
+        return null;
     }
 }

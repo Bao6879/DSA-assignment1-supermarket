@@ -3,6 +3,7 @@ package main;
 import main.linkedList.BaoList;
 import main.linkedList.BaoNode;
 import main.supermarketComponents.Aisle;
+import main.supermarketComponents.Components;
 import main.supermarketComponents.FloorArea;
 import main.supermarketComponents.Shelf;
 
@@ -35,7 +36,7 @@ public class Utilities {
         return temp;
     }
 
-    public static BaoNode constructNode(String s)
+    public static BaoNode <Components> constructNode(String s)
     {
         if (s.startsWith("Floor Area:"))
         {
@@ -70,7 +71,7 @@ public class Utilities {
     {
         BaoList temp=new BaoList();
         for (Object o : list)
-            temp.addNode(constructNode(o.toString()));
+            temp.addNode(new BaoNode(o));
         return temp;
     }
 }

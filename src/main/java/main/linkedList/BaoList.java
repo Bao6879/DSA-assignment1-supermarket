@@ -29,17 +29,32 @@ public class BaoList <E> implements Iterable <E>{
         newNode.setNext(node);
         node.setPrev(newNode);
     }
-    public BaoNode <E> removeNode(BaoNode <E> node) {
+    public void removeNode(BaoNode <E> node) {
         BaoNode <E> delNode = searchNode(node);
         if (delNode == null) {
-            return null;
+            return;
         }
-        if (delNode.getNext() != null)
+        if (delNode.getNext() != null) {
             delNode.getNext().setPrev(delNode.getPrev());
+            if (delNode ==head) {
+                head = delNode.getNext();
+            }
+        }
         if (delNode.getPrev() != null)
             delNode.getPrev().setNext(delNode.getNext());
+        if (delNode.getNext() == null && delNode.getPrev() == null && head == delNode) {
+            head = null;
+        }
+        delNode.setNext(null);
+        delNode.setPrev(null);
         size--;
-        return delNode;
+    }
+    public BaoList <E> subList(int start, int end) {
+        BaoList <E> subList = new BaoList();
+        BaoNode <E> subHead = head;
+        for (int i = start; i <= end; i++)
+            subList.addNode(subHead);
+        return subList;
     }
     public void clear()
     {
