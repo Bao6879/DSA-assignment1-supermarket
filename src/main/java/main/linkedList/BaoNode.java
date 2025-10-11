@@ -1,10 +1,8 @@
-package com.example.dsaassignment1.linkedList;
+package main.linkedList;
 
-import com.example.dsaassignment1.supermarketComponents.Aisle;
-import com.example.dsaassignment1.supermarketComponents.FloorArea;
-import com.example.dsaassignment1.supermarketComponents.Shelf;
-
-import java.util.Objects;
+import main.supermarketComponents.Aisle;
+import main.supermarketComponents.FloorArea;
+import main.supermarketComponents.Shelf;
 
 public class BaoNode <E> {
     private BaoNode <E> next, prev;

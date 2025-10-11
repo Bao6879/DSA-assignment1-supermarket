@@ -1,4 +1,4 @@
-package com.example.dsaassignment1.linkedList;
+package main.linkedList;
 
 import java.util.Iterator;
 

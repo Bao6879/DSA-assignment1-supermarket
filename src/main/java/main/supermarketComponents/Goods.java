@@ -1,4 +1,4 @@
-package com.example.dsaassignment1.supermarketComponents;
+package main.supermarketComponents;
 
 public class Goods {
     private String description, name;

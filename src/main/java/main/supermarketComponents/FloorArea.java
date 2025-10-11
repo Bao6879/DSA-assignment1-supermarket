@@ -1,6 +1,6 @@
-package com.example.dsaassignment1.supermarketComponents;
+package main.supermarketComponents;
 
-import com.example.dsaassignment1.linkedList.BaoList;
+import main.linkedList.BaoList;
 
 import java.util.Objects;
 

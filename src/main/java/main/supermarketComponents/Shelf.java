@@ -1,6 +1,8 @@
-package com.example.dsaassignment1.supermarketComponents;
+package main.supermarketComponents;
 
-import com.example.dsaassignment1.linkedList.BaoList;
+import main.linkedList.BaoList;
+
+import java.util.Objects;
 
 public class Shelf extends Components {
     private int number;
@@ -18,6 +20,9 @@ public class Shelf extends Components {
     public BaoList <Goods> getGoods() {
         return goods;
     }
+    public void setGoods(BaoList <Goods> goods) {
+        this.goods = goods;
+    }
     @Override
     public int getTotalSize() {
         int totalSize = 0;
@@ -27,7 +32,14 @@ public class Shelf extends Components {
     }
     @Override
     public String toString() {
-        return "Shelf Number: " + number;
+        return "Shelf: " + number;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Shelf shelf = (Shelf) o;
+        return number == shelf.number;
+    }
 }

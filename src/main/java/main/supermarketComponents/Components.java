@@ -1,4 +1,4 @@
-package com.example.dsaassignment1.supermarketComponents;
+package main.supermarketComponents;
 
 public abstract class Components {
     public abstract int getTotalSize();

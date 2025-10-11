@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="862.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.dsaassignment1.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="862.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
@@ -93,12 +93,29 @@
                   <TableColumn fx:id="aisleTemperature" prefWidth="261.60003662109375" text="Temperature" />
               </columns>
             </TableView>
-            <TableView fx:id="table" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="347.0" prefWidth="862.0" VBox.vgrow="ALWAYS">
+            <TableView fx:id="floorAreaTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="347.0" prefWidth="862.0" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn fx:id="floorAreaNo" prefWidth="75.0" text="No." />
                 <TableColumn fx:id="floorAreaTitle" prefWidth="594.3999404907227" text="Title" />
                   <TableColumn fx:id="floorAreaLevel" minWidth="0.0" prefWidth="187.99993896484375" text="Level" />
               </columns>
+            </TableView>
+            <TableView fx:id="shelfTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" VBox.vgrow="NEVER">
+               <columns>
+                  <TableColumn fx:id="shelfNo" prefWidth="65.6000354886055" text="No." />
+                  <TableColumn fx:id="shelfNumber" prefWidth="264.79993438720703" text="Number" />
+               </columns>
+            </TableView>
+            <TableView fx:id="goodsTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" VBox.vgrow="NEVER">
+               <columns>
+                  <TableColumn fx:id="goodsNo" prefWidth="47.199980556964874" text="No." />
+                  <TableColumn fx:id="goodsName" prefWidth="87.19995880126953" text="Name" />
+                  <TableColumn fx:id="goodsDescription" prefWidth="236.800048828125" text="Description" />
+                  <TableColumn fx:id="goodsWeight" prefWidth="89.60003662109375" text="Weight" />
+                  <TableColumn fx:id="goodsQuantity" prefWidth="80.00009155273438" text="Quantity" />
+                  <TableColumn fx:id="goodsPrice" prefWidth="75.199951171875" text="Price" />
+                  <TableColumn fx:id="goodsImage" prefWidth="155.99984741210938" text="Image" />
+               </columns>
             </TableView>
          </children>
       </VBox>

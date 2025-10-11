@@ -1,4 +1,4 @@
-module com.example.dsaassignment1 {
+module main {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
@@ -13,9 +13,9 @@ module com.example.dsaassignment1 {
     requires java.desktop;
     requires annotations;
 
-    opens com.example.dsaassignment1 to javafx.fxml;
-    exports com.example.dsaassignment1.supermarketComponents;
-    exports com.example.dsaassignment1;
-    exports com.example.dsaassignment1.linkedList;
-    opens com.example.dsaassignment1.linkedList to javafx.fxml;
+    opens main to javafx.fxml;
+    exports main.supermarketComponents;
+    exports main;
+    exports main.linkedList;
+    opens main.linkedList to javafx.fxml;
 }

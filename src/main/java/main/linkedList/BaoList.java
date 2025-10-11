@@ -1,10 +1,8 @@
-package com.example.dsaassignment1.linkedList;
+package main.linkedList;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 public class BaoList <E> implements Iterable <E>{
     private BaoNode <E> head;
@@ -45,10 +43,8 @@ public class BaoList <E> implements Iterable <E>{
     }
     public void clear()
     {
-        while (size>0)
-        {
-            removeNode(head);
-        }
+        size=0;
+        head = null;
     }
     public int getSize() {
         return size;
@@ -64,6 +60,17 @@ public class BaoList <E> implements Iterable <E>{
             current = current.getNext();
         }
         return null;
+    }
+    public BaoNode <E> getNode(int index) {
+        BaoNode <E> current = head;
+        int num=0;
+        while (current != null && num<index) {
+            current = current.getNext();
+            num++;
+        }
+        if (index>num)
+            return null;
+        return current;
     }
     @NotNull
     @Override
