@@ -2,6 +2,7 @@ package main.supermarketComponents;
 
 import main.Utilities;
 import main.linkedList.BaoList;
+import main.linkedList.BaoNode;
 
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ public class Aisle extends Components{
         setLength(length);
         setWidth(width);
         setTemperature(temperature);
+        setAttributes();
         shelves = new BaoList<>();
     }
 
@@ -61,6 +63,19 @@ public class Aisle extends Components{
     }
 
     @Override
+    public double similarScore(Components other) {
+        if (other==null)
+            return Double.MAX_VALUE-1;
+        Aisle otherAisle = (Aisle) other;
+        double difference=Math.abs(getLength()-otherAisle.getLength())+Math.abs(getWidth()-otherAisle.getWidth())+Math.abs(getTemperature()-otherAisle.getTemperature());
+        difference+=Math.abs(otherAisle.getName().length()-getName().length());
+        for (int i=0; i<Math.min(getName().length(), otherAisle.getName().length()); i++)
+            if (getName().charAt(i)!=otherAisle.getName().charAt(i))
+                difference++;
+        return difference;
+    }
+
+    @Override
     public int getTotalSize() {
         int totalSize = 0;
         for (Shelf shelf : shelves) {
@@ -75,10 +90,29 @@ public class Aisle extends Components{
     }
 
     @Override
+    public String toRawString() {
+        return name+", "+length+", "+width+", "+temperature;
+    }
+
+    @Override
+    public void setAttributes() {
+        attributes = new BaoList();
+        attributes.addNode(new BaoNode(Utilities.defaultString));
+        attributes.addNode(new BaoNode(Utilities.defaultDouble));
+        attributes.addNode(new BaoNode(Utilities.defaultDouble));
+        attributes.addNode(new BaoNode(Utilities.defaultDouble));
+    }
+
+    @Override
+    public BaoList getAttributes() {
+        return attributes;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Aisle aisle = (Aisle) o;
-        return Double.compare(length, aisle.length) == 0 && Double.compare(width, aisle.width) == 0 && Double.compare(temperature, aisle.temperature) == 0 && Objects.equals(name, aisle.name);
+        return Objects.equals(name, aisle.name);
     }
 }

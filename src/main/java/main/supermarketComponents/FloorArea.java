@@ -2,25 +2,27 @@ package main.supermarketComponents;
 
 import main.Utilities;
 import main.linkedList.BaoList;
+import main.linkedList.BaoNode;
 
 import java.util.Objects;
 
 public class FloorArea extends Components {
-    private String title;
+    private String name;
     private int level;
     private BaoList <Aisle> aisles;
-    public FloorArea(String title, int level) {
-        setTitle(title);
+    public FloorArea(String name, int level) {
+        setName(name);
         setLevel(level);
+        setAttributes();
         aisles = new BaoList<>();
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getLevel() {
@@ -42,6 +44,11 @@ public class FloorArea extends Components {
             this.aisles = Utilities.copyList(aisles);
     }
 
+    @Override
+    public double similarScore(Components other) {
+        return 0;
+    }
+
     public Aisle findAisle(Aisle aisle) {
         for (Aisle a : aisles) {
             if (a == aisle)
@@ -61,7 +68,24 @@ public class FloorArea extends Components {
 
     @Override
     public String toString() {
-        return "Floor Area: "+title+"; Level: "+level;
+        return "Floor Area: "+ name +"; Level: "+level;
+    }
+
+    @Override
+    public String toRawString() {
+        return name +", "+level;
+    }
+
+    @Override
+    public void setAttributes() {
+        attributes = new BaoList();
+        attributes.addNode(new BaoNode<>(Utilities.defaultString));
+        attributes.addNode(new BaoNode<>(Utilities.defaultInteger));
+    }
+
+    @Override
+    public BaoList getAttributes() {
+        return attributes;
     }
 
     @Override
@@ -69,6 +93,6 @@ public class FloorArea extends Components {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FloorArea floorArea = (FloorArea) o;
-        return level == floorArea.level && Objects.equals(title, floorArea.title);
+        return level == floorArea.level && Objects.equals(name, floorArea.name);
     }
 }

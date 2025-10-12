@@ -1,5 +1,6 @@
 package main;
 
+import javafx.beans.value.ChangeListener;
 import main.linkedList.BaoList;
 import main.linkedList.BaoNode;
 import main.supermarketComponents.*;
@@ -43,7 +44,7 @@ public class MainController {
     public TextField rootField;
     public ChoiceBox<String> rootChoice;
     public Button rootButton, backButton;
-    public Label label;
+    public Label label, comment, instruction;
 
     //Back end
     private BaoList <FloorArea> baoList=new BaoList<>();
@@ -52,8 +53,13 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        rootChoice.getItems().addAll("Add", "Remove", "Search", "Smart Add", "Move To", "Add Objects With Absolute Path");
+        rootChoice.getItems().addAll("Add", "Remove", "Search", "Smart Add", "Move To");
         rootChoice.getSelectionModel().selectFirst();
+        rootChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            setInstructions();
+        });
+        comment.setText("Follow the instructions below, this label will report errors/mistakes!");
+        setInstructions();
 
         floorAreaInitialization();
         aisleInitialization();
@@ -61,9 +67,29 @@ public class MainController {
         goodsInitialization();
     }
 
+    @FXML
+    private void setInstructions() {
+        switch (rootChoice.getSelectionModel().getSelectedItem())
+        {
+            case "Add" -> setAddInstructions();
+            case "Smart Add" -> instruction.setText("This option will add goods where they 'fit' most. Do this if you know how to format goods.");
+        }
+    }
+
+    private void setAddInstructions()
+    {
+        switch (currentPath.getSize())
+        {
+            case 0 -> instruction.setText("Floor Area Format: STRING (title), INT (level); REPEAT");
+            case 1 -> instruction.setText("Aisle Format: STRING (name), DOUBLE (length), DOUBLE (width), DOUBLE (temperature); REPEAT");
+            case 2 -> instruction.setText("Shelf Format: INT (number); REPEAT");
+            case 3 -> instruction.setText("Goods Format: STRING (name), STRING (description), DOUBLE (weight), DOUBLE (price), INT (quantity), DOUBLE (temperature); REPEAT");
+        }
+    }
+
     private void floorAreaInitialization()
     {
-        floorAreaTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        floorAreaTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
         floorAreaLevel.setCellValueFactory(new PropertyValueFactory<>("level"));
         floorAreaNo.setCellValueFactory(cellData -> {
             int index= floorAreaTable.getItems().indexOf(cellData.getValue())+1;
@@ -151,53 +177,147 @@ public class MainController {
     private void rootAction(ActionEvent event) {
         String choice=rootChoice.getSelectionModel().getSelectedItem();
         String input=rootField.getText();
+        int handledLength = 0;
         if (choice.equals("Add")) {
             if (pos==null) {
-                int handledLength = 0;
                 String floorArea;
                 while (handledLength < input.length()) {
                     floorArea = Utilities.extractElement(input.substring(handledLength));
-                    FloorArea temp=getFloorAreaFromString(floorArea.trim());
+                    if (Utilities.checkStringNotFitType(floorArea, "floorArea"))
+                    {
+                        comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                        return;
+                    }
+                    FloorArea temp=Utilities.getFloorAreaFromString(floorArea.trim(), comment);
+                    if (temp==null)
+                        return;
+                    if (baoList.searchNode(new BaoNode<>(temp))!=null)
+                    {
+                        comment.setText("This floor area already exists!");
+                        return;
+                    }
                     baoList.addNode(new BaoNode<>(temp));
                     floorAreaTable.getItems().add(temp);
                     handledLength += floorArea.length() + 1;
                 }
             }
             else if (pos.getContent() instanceof FloorArea) {
-                int handledLength = 0;
                 String aisle;
                 while (handledLength < input.length()) {
                     aisle = Utilities.extractElement(input.substring(handledLength));
-                    Aisle temp=getAisleFromString(aisle.trim());
-                    ((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList().addNode(new BaoNode<>(temp));
+                    if (Utilities.checkStringNotFitType(aisle, "aisle"))
+                    {
+                        comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                        return;
+                    }
+                    Aisle temp=Utilities.getAisleFromString(aisle.trim(), comment);
+                    if (temp==null)
+                        return;
+                    BaoList tmpList=((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList();
+                    if (fullSearch(new BaoNode<>(temp))!=null)
+                    {
+                        comment.setText("This aisle already exists!");
+                        return;
+                    }
+                    tmpList.addNode(new BaoNode<>(temp));
                     aisleTable.getItems().add(temp);
                     handledLength += aisle.length() + 1;
                 }
             }
             else if (pos.getContent() instanceof Aisle) {
-                int handledLength = 0;
                 String shelf;
                 while (handledLength < input.length()) {
                     shelf = Utilities.extractElement(input.substring(handledLength));
-                    Shelf temp=getShelfFromString(shelf);
-                    ((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList().addNode(new BaoNode<>(temp));
+                    if (Utilities.checkStringNotFitType(shelf, "shelf"))
+                    {
+                        comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                        return;
+                    }
+                    Shelf temp=Utilities.getShelfFromString(shelf, comment);
+                    if (temp==null)
+                        return;
+                    BaoList tmpList=((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList();
+                    if (tmpList.searchNode(new BaoNode<>(temp))!=null)
+                    {
+                        comment.setText("This shelf already exists!");
+                        return;
+                    }
+                    tmpList.addNode(new BaoNode<>(temp));
                     shelfTable.getItems().add(temp);
                     handledLength += shelf.length() + 1;
                 }
             }
             else
             {
-                int handledLength = 0;
                 String goods;
                 while (handledLength < input.length()) {
                     goods = Utilities.extractElement(input.substring(handledLength));
-                    Goods temp=getGoodFromString(goods);
-                    ((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList().addNode(new BaoNode<>(temp));
-                    goodsTable.getItems().add(temp);
+                    if (Utilities.checkStringNotFitType(goods, "goods"))
+                    {
+                        comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                        return;
+                    }
+                    Goods temp=Utilities.getGoodFromString(goods, comment);
+                    if (temp==null)
+                        return;
+                    BaoList tmpList=((Components)(findNodeByPath(currentPath, pos).getContent())).getInnerList();
+                    BaoNode tmp=tmpList.searchNode(new BaoNode<>(temp));
+                    if (tmp!=null) {
+                        ((Goods) tmp.getContent()).setQuantity(((Goods) tmp.getContent()).getQuantity() + temp.getQuantity());
+                        goodsTable.getItems().set(goodsNo.getCellData((Goods) tmp.getContent())-1, (Goods) tmp.getContent()); //0 indexed
+                    }
+                    else {
+                        tmpList.addNode(new BaoNode<>(temp));
+                        goodsTable.getItems().add(temp);
+                    }
                     handledLength += goods.length() + 1;
                 }
             }
+            comment.setText("No errors here.");
         }
+        else if (choice.equals("Smart Add"))
+        {
+            String goods, location="Added to: ";
+            while (handledLength < input.length()) {
+                goods = Utilities.extractElement(input.substring(handledLength));
+                if (Utilities.checkStringNotFitType(goods, "goods"))
+                {
+                    comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                    return;
+                }
+                Goods temp=Utilities.getGoodFromString(goods, comment);
+                if (temp==null)
+                    return;
+                BaoNode place=fullSearch(new BaoNode<>(temp));
+                if (place!=null)
+                {
+                    ((Goods)(place.getContent())).setQuantity(((Goods) place.getContent()).getQuantity() + temp.getQuantity());
+                    goodsTable.getItems().set(goodsNo.getCellData((Goods) place.getContent())-1, (Goods) place.getContent()); //0 indexed
+                    location+=((Components)place.getContent()).getName()+"; ";
+                }
+                else
+                {
+                    Components similar=similarSearch(new BaoNode<>(temp));
+                    if (similar==null)
+                    {
+                        return;
+                    }
+                    else if (similar instanceof Goods)
+                    {
+                        comment.setText("There's no place to put this yet. Add floor areas, aisles, and shelves first!");
+                        return;
+                    }
+                    else {
+                        similar.getInnerList().addNode(new BaoNode<>(temp));
+                        location+=similar.getName()+"; ";
+                    }
+                }
+                handledLength += goods.length() + 1;
+            }
+            comment.setText(location.substring(0, location.length()-2));
+        }
+        if (rootField.getText().isEmpty())
+            comment.setText("There's literally no input.");
     }
 
     ///MENU ITEMS
@@ -207,16 +327,41 @@ public class MainController {
         edit.setOnAction(event -> {
             if (tableView.getSelectionModel().getSelectedItem()==null)
                 return;
-            BaoNode tmp=Utilities.constructNode(tableView.getSelectionModel().getSelectedItem().toString());
+            BaoNode tmp=Utilities.constructNode(((Components) tableView.getSelectionModel().getSelectedItem()).toRawString());
             Object replaced;
-            if (tmp.getContent() instanceof FloorArea)
-                replaced = getFloorAreaFromString(Utilities.extractElement(rootField.getText()));
-            else if (tmp.getContent() instanceof Aisle)
-                replaced = getAisleFromString(Utilities.extractElement(rootField.getText()));
-            else if (tmp.getContent() instanceof Shelf)
-                replaced = getShelfFromString(Utilities.extractElement(rootField.getText()));
-            else
-                replaced = getGoodFromString(Utilities.extractElement(rootField.getText()));
+            if (tmp.getContent() instanceof FloorArea) {
+                if (Utilities.checkStringNotFitType(Utilities.extractElement(rootField.getText()), "floorArea"))
+                {
+                    comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                    return;
+                }
+                replaced=Utilities.getFloorAreaFromString(Utilities.extractElement(rootField.getText()), comment);
+            }
+            else if (tmp.getContent() instanceof Aisle) {
+                if (Utilities.checkStringNotFitType(Utilities.extractElement(rootField.getText()), "aisle"))
+                {
+                    comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                    return;
+                }
+                replaced = Utilities.getAisleFromString(Utilities.extractElement(rootField.getText()), comment);
+            }
+            else if (tmp.getContent() instanceof Shelf) {
+                if (Utilities.checkStringNotFitType(Utilities.extractElement(rootField.getText()), "shelf")) {
+                    comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                    return;
+                }
+                replaced = Utilities.getShelfFromString(Utilities.extractElement(rootField.getText()), comment);
+            }
+            else {
+                if (Utilities.checkStringNotFitType(Utilities.extractElement(rootField.getText()), "goods"))
+                {
+                    comment.setText("Your formatting is off. Check your ',' and ';' count?");
+                    return;
+                }
+                replaced = Utilities.getGoodFromString(Utilities.extractElement(rootField.getText()), comment);
+            }
+            if (replaced==null)
+                return;
             if (currentPath.getSize()>=1) {
                 ((Components) replaced).setInnerList(((Components)(((Components) findNodeByPath(currentPath, currentPath.getNode(currentPath.getSize()-1)).getContent()).getInnerList().searchNode(tmp).getContent())).getInnerList());
                 ((BaoNode<Components>) (findNodeByPath(currentPath, currentPath.getNode(currentPath.getSize()-1)))).getContent().getInnerList().searchNode(tmp).setContent(replaced);
@@ -226,6 +371,10 @@ public class MainController {
                 baoList.searchNode(tmp).setContent(replaced);
             }
             ((TableView<Object>)(tableView)).getItems().set(((TableColumn <Components, Integer>)(noColumn)).getCellData((Components) tmp.getContent())-1, replaced); //0 indexed
+            if (rootField.getText().isEmpty())
+                comment.setText("There's literally no input");
+            else
+                comment.setText("No errors here. Edit only takes the first input in the field.");
         });
         return edit;
     }
@@ -236,15 +385,29 @@ public class MainController {
         delete.setOnAction(event -> {
             if (tableView.getSelectionModel().getSelectedItem()==null)
                 return;
-            BaoNode tmp=Utilities.constructNode(tableView.getSelectionModel().getSelectedItem().toString());
+            BaoNode tmp=Utilities.constructNode(((Components) tableView.getSelectionModel().getSelectedItem()).toRawString());
             if (tmp.getContent() instanceof FloorArea)
                 baoList.removeNode(tmp);
             else if (tmp.getContent() instanceof Aisle)
                 ((FloorArea)(findNodeByPath(currentPath, currentPath.getNode(0)).getContent())).getInnerList().removeNode(tmp);
             else if (tmp.getContent() instanceof Shelf)
                 ((Aisle)(findNodeByPath(currentPath, currentPath.getNode(1)).getContent())).getInnerList().removeNode(tmp);
-            else
-                ((Shelf)(findNodeByPath(currentPath, currentPath.getNode(2)).getContent())).getInnerList().removeNode(tmp);
+            else {
+                BaoNode <Goods> node=((Shelf) (findNodeByPath(currentPath, currentPath.getNode(2)).getContent())).getInnerList().searchNode(tmp);
+                if (Utilities.checkStringInvalidInteger(rootField.getText(), comment))
+                    ((Shelf) (findNodeByPath(currentPath, currentPath.getNode(2)).getContent())).getInnerList().removeNode(tmp);
+                else
+                {
+                    int amount=Integer.parseInt(rootField.getText().trim());
+                    if (amount>=node.getContent().getQuantity())
+                        ((Shelf) (findNodeByPath(currentPath, currentPath.getNode(2)).getContent())).getInnerList().removeNode(tmp);
+                    else {
+                        node.getContent().setQuantity(node.getContent().getQuantity() - amount);
+                        Goods replaced=node.getContent();
+                        ((TableView<Object>)(tableView)).getItems().set((goodsNo).getCellData(replaced)-1, replaced); //0 indexed
+                    }
+                }
+            }
             tableView.getItems().remove(tmp.getContent());
         });
         return delete;
@@ -256,91 +419,24 @@ public class MainController {
         visit.setOnAction(event -> {
             if (oldTableView.getSelectionModel().getSelectedItem()==null)
                 return;
-            VBox.setVgrow(oldTableView, Priority.NEVER);
-            oldTableView.setPrefWidth(0);
-            oldTableView.setPrefHeight(0);
+            moveToTable(oldTableView, newTableView);
 
-            VBox.setVgrow(newTableView, Priority.ALWAYS);
-            newTableView.setPrefWidth(100);
-            newTableView.setPrefHeight(100);
-
-            pos=Utilities.constructNode(oldTableView.getSelectionModel().getSelectedItem().toString());
+            pos=Utilities.constructNode(((Components) oldTableView.getSelectionModel().getSelectedItem()).toRawString());
             if (pos!=null) {
                 currentPath.addNode(pos);
                 BaoNode tmp=findNodeByPath(currentPath, pos);
                 currentList=Utilities.copyList(((Components)(tmp.getContent())).getInnerList());
 
                 if (pos.getContent() instanceof FloorArea)
-                    moveToFloorArea(((FloorArea)pos.getContent()).getTitle());
+                    moveToFloorArea(((FloorArea)pos.getContent()).getName());
                 else if (pos.getContent() instanceof Aisle)
                     moveToAisle(((Aisle)pos.getContent()).getName());
                 else if (pos.getContent() instanceof Shelf)
                     moveToShelf(String.valueOf(((Shelf)pos.getContent()).getNumber()));
+                setInstructions();
             }
         });
         return visit;
-    }
-
-    ///INFO EXTRACTION FROM STRINGS
-    private FloorArea getFloorAreaFromString(String floorArea) {
-        String title, level;
-        title = Utilities.extractAttribute(floorArea);
-        level = Utilities.extractElement(floorArea.substring(title.length() + 1));
-
-        return new FloorArea(title.trim(), Integer.parseInt(level.trim()));
-    }
-
-    private Aisle getAisleFromString(String aisle)
-    {
-        String name, length, width, temperature;
-        int currentPosition=0;
-        name = Utilities.extractAttribute(aisle);
-        currentPosition+=name.length()+1;
-
-        length=Utilities.extractAttribute(aisle.substring(currentPosition));
-        currentPosition+=length.length()+1;
-
-        width=Utilities.extractAttribute(aisle.substring(currentPosition));
-        currentPosition+=width.length()+1;
-
-        temperature=Utilities.extractElement(aisle.substring(currentPosition));
-
-        return new Aisle(name.trim(), Double.parseDouble(length.trim()), Double.parseDouble(width.trim()), Double.parseDouble(temperature.trim()));
-    }
-
-    private Shelf getShelfFromString(String shelf)
-    {
-        String number;
-        number=Utilities.extractAttribute(shelf);
-
-        return new Shelf(Integer.parseInt(number.trim()));
-    }
-
-    private Goods getGoodFromString(String goods)
-    {
-        String name, description, weight, price, quantity, temperature, image;
-        int currentPosition=0;
-        name = Utilities.extractAttribute(goods);
-        currentPosition+=name.length()+1;
-
-        description=Utilities.extractAttribute(goods.substring(currentPosition));
-        currentPosition+=description.length()+1;
-
-        weight=Utilities.extractAttribute(goods.substring(currentPosition));
-        currentPosition+=weight.length()+1;
-
-        price=Utilities.extractAttribute(goods.substring(currentPosition));
-        currentPosition+=price.length()+1;
-
-        quantity=Utilities.extractAttribute(goods.substring(currentPosition));
-        currentPosition+=quantity.length()+1;
-
-        temperature=Utilities.extractAttribute(goods.substring(currentPosition));
-        currentPosition+=temperature.length()+1;
-
-        image=Utilities.extractElement(goods.substring(currentPosition));
-
-        return new Goods(name.trim(), description.trim(), Double.parseDouble(weight.trim()), Double.parseDouble(price.trim()), Integer.parseInt(quantity.trim()), Double.parseDouble(temperature.trim()), image.trim());
     }
 
     ///MOVEMENT TO COMPONENTS
@@ -375,14 +471,7 @@ public class MainController {
             floorAreaTable.getItems().clear();
             for (FloorArea floorArea : baoList)
                 floorAreaTable.getItems().add(floorArea);
-
-            VBox.setVgrow(aisleTable, Priority.NEVER);
-            aisleTable.setPrefWidth(0);
-            aisleTable.setPrefHeight(0);
-
-            VBox.setVgrow(floorAreaTable, Priority.ALWAYS);
-            floorAreaTable.setPrefWidth(100);
-            floorAreaTable.setPrefHeight(100);
+            moveToTable(aisleTable, floorAreaTable);
         }
         else if (pos.getContent() instanceof Aisle) {
             pos=new BaoNode(currentPath.getNode(0).getContent());
@@ -390,15 +479,8 @@ public class MainController {
             currentList.clear();
             for (Object aisle: ((Components)(findNodeByPath(currentPath.subList(0), currentPath.getNode(0)).getContent())).getInnerList())
                 currentList.addNode(new BaoNode<>((Aisle)(aisle)));
-            moveToFloorArea(((FloorArea)pos.getContent()).getTitle());
-
-            VBox.setVgrow(shelfTable, Priority.NEVER);
-            shelfTable.setPrefWidth(0);
-            shelfTable.setPrefHeight(0);
-
-            VBox.setVgrow(aisleTable, Priority.ALWAYS);
-            aisleTable.setPrefWidth(100);
-            aisleTable.setPrefHeight(100);
+            moveToFloorArea(((FloorArea)pos.getContent()).getName());
+            moveToTable(shelfTable, aisleTable);
         }
         else if (pos.getContent() instanceof Shelf)
         {
@@ -408,14 +490,7 @@ public class MainController {
             for (Object shelf: ((Components)(findNodeByPath(currentPath.subList(1), currentPath.getNode(1)).getContent())).getInnerList())
                 currentList.addNode(new BaoNode<>((Shelf)(shelf)));
             moveToAisle(((Aisle)pos.getContent()).getName());
-
-            VBox.setVgrow(goodsTable, Priority.NEVER);
-            goodsTable.setPrefWidth(0);
-            goodsTable.setPrefHeight(0);
-
-            VBox.setVgrow(shelfTable, Priority.ALWAYS);
-            shelfTable.setPrefWidth(100);
-            shelfTable.setPrefHeight(100);
+            moveToTable(goodsTable, shelfTable);
         }
         currentPath.removeNode(currentPath.getNode(currentPath.getSize()-1));
     }
@@ -432,6 +507,78 @@ public class MainController {
             case 3: return baoList.searchNode((BaoNode<FloorArea>) path.getNode(0)).getContent().getInnerList().searchNode((BaoNode<Aisle>) path.getNode(1)).getContent().getInnerList().searchNode((BaoNode<Shelf>) node);
             default: return null;
         }
+    }
+
+    private void moveToTable(TableView oldTable, TableView newTable)
+    {
+        VBox.setVgrow(oldTable, Priority.NEVER);
+        oldTable.setPrefWidth(0);
+        oldTable.setPrefHeight(0);
+
+        VBox.setVgrow(newTable, Priority.ALWAYS);
+        newTable.setPrefWidth(100);
+        newTable.setPrefHeight(100);
+    }
+
+    private Components similarSearch(BaoNode <?> node)
+    {
+        if (node.getDepth()==0)
+            return null;
+        BaoNode cmpNode = new BaoNode(null);
+        Components retNode=new Goods("", "", 0, 0, 0, 0, "");
+        double similarScore=Double.MAX_VALUE;
+        for (FloorArea floorArea: baoList)
+        {
+            if (node.getDepth()==1)
+            {
+                BaoNode <Aisle> tmp=floorArea.getInnerList().similarNode((BaoNode<Aisle>) node);
+                if (tmp==null) {
+                    retNode=floorArea;
+                    continue;
+                }
+                if (tmp.getContent().similarScore((Components) cmpNode.getContent())<similarScore)
+                {
+                    similarScore=tmp.getContent().similarScore((Components) cmpNode.getContent());
+                    cmpNode=tmp;
+                    retNode=floorArea;
+                }
+                continue;
+            }
+            for (Aisle aisle: floorArea.getInnerList())
+            {
+                if (node.getDepth()==2)
+                {
+                    BaoNode <Shelf> tmp=aisle.getInnerList().similarNode((BaoNode<Shelf>) node);
+                    if (tmp==null) {
+                        retNode=aisle;
+                        continue;
+                    }
+                    if (tmp.getContent().similarScore((Components) cmpNode.getContent())<similarScore)
+                    {
+                        similarScore=tmp.getContent().similarScore((Components) cmpNode.getContent());
+                        cmpNode=tmp;
+                        retNode=aisle;
+                    }
+                    continue;
+                }
+                for (Shelf shelf: aisle.getInnerList())
+                {
+                    BaoNode <Goods> tmp=shelf.getInnerList().searchNode((BaoNode<Goods>) node);
+                    if (tmp==null)
+                    {
+                        retNode=shelf;
+                        continue;
+                    }
+                    if (tmp.getContent().similarScore((Components) cmpNode.getContent())<similarScore)
+                    {
+                        similarScore=tmp.getContent().similarScore((Components) cmpNode.getContent());
+                        cmpNode=tmp;
+                        retNode=shelf;
+                    }
+                }
+            }
+        }
+        return retNode;
     }
 
     private BaoNode <?> fullSearch(BaoNode <?> node)

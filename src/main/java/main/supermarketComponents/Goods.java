@@ -1,6 +1,8 @@
 package main.supermarketComponents;
 
+import main.Utilities;
 import main.linkedList.BaoList;
+import main.linkedList.BaoNode;
 
 import java.util.Objects;
 
@@ -16,6 +18,7 @@ public class Goods extends Components {
         setWeight(weight);
         setQuantity(quantity);
         setTemperature(temperature);
+        setAttributes();
         setImageUrl(imageUrl);
     }
 
@@ -80,7 +83,7 @@ public class Goods extends Components {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Goods goods = (Goods) o;
-        return Double.compare(price, goods.price) == 0 && Double.compare(weight, goods.weight) == 0 && Double.compare(temperature, goods.temperature) == 0 && quantity == goods.quantity && Objects.equals(description, goods.description) && Objects.equals(name, goods.name) && Objects.equals(imageUrl, goods.imageUrl);
+        return Double.compare(price, goods.price) == 0 && Double.compare(weight, goods.weight) == 0 && Double.compare(temperature, goods.temperature) == 0 && Objects.equals(description, goods.description) && Objects.equals(name, goods.name) && Objects.equals(imageUrl, goods.imageUrl);
     }
 
     @Override
@@ -94,6 +97,28 @@ public class Goods extends Components {
     }
 
     @Override
+    public String toRawString() {
+        return name+", "+description+", "+weight+", "+price+", "+quantity+", "+temperature+", "+imageUrl;
+    }
+
+    @Override
+    public void setAttributes() {
+        attributes=new BaoList();
+        attributes.addNode(new BaoNode(Utilities.defaultString));
+        attributes.addNode(new BaoNode(Utilities.defaultString));
+        attributes.addNode(new BaoNode(Utilities.defaultDouble));
+        attributes.addNode(new BaoNode(Utilities.defaultDouble));
+        attributes.addNode(new BaoNode(Utilities.defaultInteger));
+        attributes.addNode(new BaoNode(Utilities.defaultDouble));
+        attributes.addNode(new BaoNode(Utilities.defaultString));
+    }
+
+    @Override
+    public BaoList getAttributes() {
+        return attributes;
+    }
+
+    @Override
     public BaoList getInnerList() {
         return null;
     }
@@ -101,5 +126,18 @@ public class Goods extends Components {
     @Override
     public void setInnerList(BaoList<?> innerList) {
 
+    }
+
+    @Override
+    public double similarScore(Components other) {
+        if (other==null)
+            return Double.MAX_VALUE-1;
+        Goods otherGoods = (Goods) other;
+        double difference=Math.abs(otherGoods.getWeight()-getWeight())+Math.abs(otherGoods.getPrice()-getPrice())+Math.abs(otherGoods.getTemperature()-getTemperature());
+        difference+=Math.abs(otherGoods.getName().length()-getName().length());
+        for (int i=0; i<Math.min(getName().length(), otherGoods.getName().length()); i++)
+            if (getName().charAt(i)!=otherGoods.getName().charAt(i))
+                difference++;
+        return difference;
     }
 }

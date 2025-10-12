@@ -2,12 +2,14 @@ package main.supermarketComponents;
 
 import main.Utilities;
 import main.linkedList.BaoList;
+import main.linkedList.BaoNode;
 
 public class Shelf extends Components {
     private int number;
     private BaoList <Goods> goods;
     public Shelf(int number) {
         setNumber(number);
+        setAttributes();
         goods = new BaoList<>();
     }
     public int getNumber() {
@@ -25,6 +27,20 @@ public class Shelf extends Components {
         if (goods!=null && goods.getHead()!=null && goods.getHead().getContent() instanceof Goods)
             this.goods = Utilities.copyList(goods);
     }
+
+    @Override
+    public double similarScore(Components other) {
+        if (other==null)
+            return Double.MAX_VALUE-1;
+        Shelf otherShelf = (Shelf) other;
+        return otherShelf.getNumber() - this.number;
+    }
+
+    @Override
+    public String getName() {
+        return getNumber()+"";
+    }
+
     @Override
     public int getTotalSize() {
         int totalSize = 0;
@@ -35,6 +51,22 @@ public class Shelf extends Components {
     @Override
     public String toString() {
         return "Shelf: " + number;
+    }
+
+    @Override
+    public String toRawString() {
+        return number + "";
+    }
+
+    @Override
+    public void setAttributes() {
+        attributes = new BaoList();
+        attributes.addNode(new BaoNode(Utilities.defaultInteger));
+    }
+
+    @Override
+    public BaoList getAttributes() {
+        return attributes;
     }
 
     @Override

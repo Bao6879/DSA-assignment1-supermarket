@@ -1,5 +1,6 @@
 package main.linkedList;
 
+import main.supermarketComponents.Components;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -80,6 +81,18 @@ public class BaoList <E> implements Iterable <E>{
             current = current.getNext();
         }
         return null;
+    }
+    public BaoNode <E> similarNode(BaoNode <E> node) {
+        BaoNode <E> current=head, most=head;
+        double minSimilarScore=Double.MAX_VALUE;
+        while (current != null) {
+            if (((Components)node.getContent()).similarScore((Components) current.getContent())<minSimilarScore) {
+                most=current;
+                minSimilarScore=((Components)node.getContent()).similarScore((Components) current.getContent());
+            }
+            current = current.getNext();
+        }
+        return most;
     }
     public BaoNode <E> getNode(int index) {
         BaoNode <E> current = head;
