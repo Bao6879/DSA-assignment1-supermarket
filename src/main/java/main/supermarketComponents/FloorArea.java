@@ -40,7 +40,7 @@ public class FloorArea extends Components {
 
     @Override
     public void setInnerList(BaoList <?> aisles) {
-        if (aisles!=null && aisles.getHead()!=null && aisles.getHead().getContent() instanceof Aisle)
+        if (aisles!=null && aisles.getNode(0)!=null && aisles.getNode(0).getContent() instanceof Aisle)
             this.aisles = Utilities.copyList(aisles);
     }
 

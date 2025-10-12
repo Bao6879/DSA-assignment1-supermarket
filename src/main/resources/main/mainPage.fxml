@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -101,6 +102,7 @@
                   <Font size="15.0" />
                </font>
             </Label>
+            <ListView fx:id="searchView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" VBox.vgrow="NEVER" />
             <TableView fx:id="aisleTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" VBox.vgrow="NEVER">
               <columns>
                 <TableColumn fx:id="aisleNo" prefWidth="47.199980556964874" text="No." />

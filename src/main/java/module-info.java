@@ -12,10 +12,12 @@ module main {
     requires com.almasb.fxgl.all;
     requires java.desktop;
     requires annotations;
+    requires xstream;
 
     opens main to javafx.fxml;
+    opens main.supermarketComponents to xstream;
+    opens main.linkedList to xstream, javafx.fxml;
     exports main.supermarketComponents;
     exports main;
     exports main.linkedList;
-    opens main.linkedList to javafx.fxml;
 }

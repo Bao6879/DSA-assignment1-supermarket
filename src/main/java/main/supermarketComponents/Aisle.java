@@ -58,7 +58,7 @@ public class Aisle extends Components{
 
     @Override
     public void setInnerList(BaoList <?> shelves) {
-        if (shelves!=null && shelves.getHead()!=null && shelves.getHead().getContent() instanceof Shelf)
+        if (shelves!=null && shelves.getNode(0)!=null && shelves.getNode(0).getContent() instanceof Shelf)
             this.shelves = Utilities.copyList(shelves);
     }
 

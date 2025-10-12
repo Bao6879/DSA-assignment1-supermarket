@@ -11,6 +11,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.List;
 
 public class MainController {
 
@@ -39,12 +47,14 @@ public class MainController {
     public TableColumn <Goods, String> goodsDescription, goodsName, goodsImage;
     public ContextMenu goodsContextMenu =new ContextMenu();
 
+
     //General
     public VBox vBox;
     public TextField rootField;
     public ChoiceBox<String> rootChoice;
     public Button rootButton, backButton;
     public Label label, comment, instruction;
+    public ListView <String> searchView;
 
     //Back end
     private BaoList <FloorArea> baoList=new BaoList<>();
@@ -53,7 +63,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        rootChoice.getItems().addAll("Add", "Remove", "Search", "Smart Add", "Move To");
+        rootChoice.getItems().addAll("Add", "Search", "Smart Add", "Reset", "Save", "Load");
         rootChoice.getSelectionModel().selectFirst();
         rootChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             setInstructions();
@@ -72,7 +82,11 @@ public class MainController {
         switch (rootChoice.getSelectionModel().getSelectedItem())
         {
             case "Add" -> setAddInstructions();
+            case "Search" -> instruction.setText("This option searches for goods with a certain name in the entire hypermarket.");
             case "Smart Add" -> instruction.setText("This option will add goods where they 'fit' most. Do this if you know how to format goods.");
+            case "Reset" -> instruction.setText("This option will wipe everything. Type 'I am sure' (without ' ) in the field to confirm.");
+            case "Save" -> instruction.setText("This option will save the current list in 'baoList.xml'.");
+            case "Load" -> instruction.setText("This option will load the list from 'baoList.xml'.");
         }
     }
 
@@ -201,6 +215,10 @@ public class MainController {
                     handledLength += floorArea.length() + 1;
                 }
             }
+            else if (pos.getContent() instanceof Goods) {
+                comment.setText("You're in the search view! Go back to the table view to edit it!");
+                return;
+            }
             else if (pos.getContent() instanceof FloorArea) {
                 String aisle;
                 while (handledLength < input.length()) {
@@ -247,7 +265,7 @@ public class MainController {
                     handledLength += shelf.length() + 1;
                 }
             }
-            else
+            else if (pos.getContent() instanceof Shelf)
             {
                 String goods;
                 while (handledLength < input.length()) {
@@ -274,9 +292,15 @@ public class MainController {
                 }
             }
             comment.setText("No errors here.");
+            if (rootField.getText().isEmpty())
+                comment.setText("There's literally no input.");
         }
         else if (choice.equals("Smart Add"))
         {
+            if (pos.getContent() instanceof Goods) {
+                comment.setText("You're in the search view! Go back to the table view to edit it!");
+                return;
+            }
             String goods, location="Added to: ";
             while (handledLength < input.length()) {
                 goods = Utilities.extractElement(input.substring(handledLength));
@@ -315,9 +339,91 @@ public class MainController {
                 handledLength += goods.length() + 1;
             }
             comment.setText(location.substring(0, location.length()-2));
+            if (rootField.getText().isEmpty())
+                comment.setText("There's literally no input.");
         }
-        if (rootField.getText().isEmpty())
-            comment.setText("There's literally no input.");
+        else if (choice.equals("Search"))
+        {
+            String search=rootField.getText();
+            int count=1;
+            BaoList <String> list=new BaoList<>();
+            for (FloorArea floorArea: baoList)
+            {
+                for (Aisle aisle: floorArea.getInnerList())
+                {
+                    for (Shelf shelf: aisle.getInnerList())
+                    {
+                        for (Goods goods: shelf.getInnerList())
+                        {
+                            if (goods.getName().equals(search))
+                            {
+                                list.addNode(new BaoNode<>("Found occurrence "+count+"at:\nFloor Area "+floorArea.getName()+", Aisle "+aisle.getName()
+                                +", Shelf "+shelf.getName()+"!"));
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            moveToTable(floorAreaTable, floorAreaTable);
+            moveToTable(aisleTable, aisleTable);
+            moveToTable(shelfTable, shelfTable);
+            moveToTable(goodsTable, goodsTable);
+            searchView.getItems().clear();
+            for (String s: list)
+                searchView.getItems().add(s);
+            VBox.setVgrow(searchView, Priority.ALWAYS);
+            searchView.setPrefHeight(100);
+            searchView.setPrefWidth(100);
+            comment.setText("Found "+(count-1)+" occurrences!");
+            pos=new BaoNode<>(new Goods("", "", 0, 0, 0, 0, ""));
+        }
+        else if (choice.equals("Reset")) {
+            if (rootField.getText().equals("I am sure")) {
+                baoList.clear();
+                floorAreaTable.getItems().clear();
+                aisleTable.getItems().clear();
+                shelfTable.getItems().clear();
+                goodsTable.getItems().clear();
+                pos = null;
+                currentPath.clear();
+                moveToTable(aisleTable, floorAreaTable);
+                moveToTable(shelfTable, floorAreaTable);
+                moveToTable(goodsTable, floorAreaTable);
+                label.setText("Bao's Hypermarket");
+                comment.setText("Reset complete. Hope you know what you're doing.");
+            } else
+                comment.setText("This is a dangerous option! Type 'I am sure' to confirm.");
+        }
+        else if (choice.equals("Save"))
+        {
+            try {
+                save();
+                comment.setText("Saved to baoList.xml!");
+            }
+            catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        else if (choice.equals("Load"))
+        {
+            try {
+                load();
+                floorAreaTable.getItems().clear();
+                pos=null;
+                currentPath.clear();
+                moveToTable(aisleTable, floorAreaTable);
+                moveToTable(shelfTable, floorAreaTable);
+                moveToTable(goodsTable, floorAreaTable);
+                for (FloorArea floorArea: baoList)
+                    floorAreaTable.getItems().add(floorArea);
+                label.setText("Bao's Hypermarket");
+                comment.setText("Loaded from baoList.xml!");
+            }
+            catch (Exception e) {
+                System.err.println("Error writing to file!");
+            }
+        }
     }
 
     ///MENU ITEMS
@@ -461,10 +567,19 @@ public class MainController {
             goodsTable.getItems().add((Goods) (node));
     }
 
+    private void goingBack(TableView <?> oldTableView, TableView <?> newTableView, int position)
+    {
+        currentList.clear();
+        for (Object object: ((Components)(findNodeByPath(currentPath.subList(position), currentPath.getNode(position)).getContent())).getInnerList())
+            currentList.addNode(new BaoNode<>(object));
+        moveToTable(oldTableView, newTableView);
+    }
+
     @FXML
     private void backAction(ActionEvent event) {
         if (pos==null)
             return;
+        boolean isSearch=false;
         if (pos.getContent() instanceof FloorArea) {
             pos=null;
             label.setText("Bao's Hypermarket");
@@ -476,26 +591,81 @@ public class MainController {
         else if (pos.getContent() instanceof Aisle) {
             pos=new BaoNode(currentPath.getNode(0).getContent());
 
-            currentList.clear();
-            for (Object aisle: ((Components)(findNodeByPath(currentPath.subList(0), currentPath.getNode(0)).getContent())).getInnerList())
-                currentList.addNode(new BaoNode<>((Aisle)(aisle)));
+            goingBack(shelfTable, aisleTable, 0);
             moveToFloorArea(((FloorArea)pos.getContent()).getName());
-            moveToTable(shelfTable, aisleTable);
         }
         else if (pos.getContent() instanceof Shelf)
         {
             pos=new BaoNode(currentPath.getNode(1).getContent());
 
-            currentList.clear();
-            for (Object shelf: ((Components)(findNodeByPath(currentPath.subList(1), currentPath.getNode(1)).getContent())).getInnerList())
-                currentList.addNode(new BaoNode<>((Shelf)(shelf)));
+            goingBack(goodsTable, shelfTable, 1);
             moveToAisle(((Aisle)pos.getContent()).getName());
-            moveToTable(goodsTable, shelfTable);
         }
-        currentPath.removeNode(currentPath.getNode(currentPath.getSize()-1));
+        else if (pos.getContent() instanceof Goods)
+        {
+            goBackFromSearch();
+            isSearch=true;
+        }
+        if (!isSearch)
+            currentPath.removeNode(currentPath.getNode(currentPath.getSize()-1));
+    }
+
+    private void goBackFromSearch()
+    {
+        VBox.setVgrow(searchView, Priority.NEVER);
+        searchView.setPrefHeight(0);
+        searchView.setPrefWidth(0);
+        if (currentPath.getSize()==0) {
+            pos=null;
+            label.setText("Bao's Hypermarket");
+            floorAreaTable.getItems().clear();
+            for (FloorArea floorArea : baoList)
+                floorAreaTable.getItems().add(floorArea);
+            moveToTable(aisleTable, floorAreaTable);
+        }
+        else {
+            pos=new BaoNode(currentPath.getNode(currentPath.getSize() - 1).getContent());
+            if (pos.getContent() instanceof FloorArea) {
+                pos=new BaoNode(currentPath.getNode(0).getContent());
+
+                goingBack(shelfTable, aisleTable, 0);
+                moveToFloorArea(((FloorArea)pos.getContent()).getName());
+            }
+            else if (pos.getContent() instanceof Aisle) {
+                pos=new BaoNode(currentPath.getNode(1).getContent());
+
+                goingBack(goodsTable, shelfTable, 1);
+                moveToAisle(((Aisle)pos.getContent()).getName());
+            }
+            else if (pos.getContent() instanceof Shelf) {
+                pos=new BaoNode(currentPath.getNode(2).getContent());
+
+                goingBack(floorAreaTable, goodsTable, 2); //Any table aside from the current one
+                moveToShelf(((Shelf)pos.getContent()).getName());
+            }
+        }
     }
 
     ///UTILITIES
+    public void save() throws Exception {
+        XStream xstream=new XStream(new DomDriver());
+        ObjectOutputStream out=xstream.createObjectOutputStream(new FileWriter("baoList.xml"));
+        out.writeObject(baoList);
+        out.close();
+    }
+    public void load() throws Exception {
+        Class<?>[] classes = new Class[] { BaoNode.class, BaoList.class, Components.class, Aisle.class, Shelf.class, FloorArea.class, Goods.class};
+
+        //setting up the xstream object with default security and the above classes
+        XStream xstream = new XStream(new DomDriver());
+        XStream.setupDefaultSecurity(xstream);
+        xstream.allowTypes(classes);
+
+        //doing the actual serialisation to an XML file
+        ObjectInputStream in = xstream.createObjectInputStream(new FileReader("baoList.xml"));
+        baoList = (BaoList<FloorArea>) in.readObject();
+        in.close();
+    }
     private BaoNode <?> findNodeByPath(BaoList <?> path, BaoNode <?> node)
     {
         if (path==null || node==null)
@@ -511,13 +681,13 @@ public class MainController {
 
     private void moveToTable(TableView oldTable, TableView newTable)
     {
-        VBox.setVgrow(oldTable, Priority.NEVER);
-        oldTable.setPrefWidth(0);
-        oldTable.setPrefHeight(0);
-
         VBox.setVgrow(newTable, Priority.ALWAYS);
         newTable.setPrefWidth(100);
         newTable.setPrefHeight(100);
+
+        VBox.setVgrow(oldTable, Priority.NEVER);
+        oldTable.setPrefWidth(0);
+        oldTable.setPrefHeight(0);
     }
 
     private Components similarSearch(BaoNode <?> node)

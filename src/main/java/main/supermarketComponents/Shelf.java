@@ -24,7 +24,7 @@ public class Shelf extends Components {
     }
     @Override
     public void setInnerList(BaoList <?> goods) {
-        if (goods!=null && goods.getHead()!=null && goods.getHead().getContent() instanceof Goods)
+        if (goods!=null && goods.getNode(0)!=null && goods.getNode(0).getContent() instanceof Goods)
             this.goods = Utilities.copyList(goods);
     }
 

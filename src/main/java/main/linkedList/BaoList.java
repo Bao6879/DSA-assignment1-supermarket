@@ -11,13 +11,9 @@ public class BaoList <E> implements Iterable <E>{
     public BaoList() {
 
     }
-    public BaoNode <E> getHead() {
-        return head;
-    }
-    public void setHead(BaoNode <E> head) {
-        this.head = head;
-    }
     public void addNode(BaoNode <E> node1) {
+        if (node1 == null)
+            return;
         size++;
         BaoNode <E> node=new BaoNode<>(node1.getContent());
         if (head == null) {
@@ -54,6 +50,8 @@ public class BaoList <E> implements Iterable <E>{
     public BaoList <E> subList(int end) {
         BaoList <E> subList = new BaoList();
         BaoNode <E> current=head;
+        if (end>=getSize() || end<0)
+            return null;
         int index=0;
         while (index <= end) {
             subList.addNode(current);
@@ -70,10 +68,9 @@ public class BaoList <E> implements Iterable <E>{
     public int getSize() {
         return size;
     }
-    public void setSize(int size) {
-        this.size = size;
-    }
     public BaoNode <E> searchNode(BaoNode <E> node) {
+        if (node==null)
+            return null;
         BaoNode <E> current = head;
         while (current != null) {
             if (node.getContent().equals(current.getContent()))
@@ -97,6 +94,8 @@ public class BaoList <E> implements Iterable <E>{
     public BaoNode <E> getNode(int index) {
         BaoNode <E> current = head;
         int num=0;
+        if (index<0)
+            return null;
         while (current != null && num<index) {
             current = current.getNext();
             num++;
