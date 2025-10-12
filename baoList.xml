@@ -1,0 +1,36 @@
+<object-stream>
+  <main.linkedList.BaoList>
+    <head>
+      <depth>0</depth>
+      <content class="main.supermarketComponents.FloorArea">
+        <name>bao</name>
+        <level>1</level>
+        <aisles>
+          <head>
+            <depth>1</depth>
+            <content class="main.supermarketComponents.Aisle">
+              <name>bao</name>
+              <length>1.0</length>
+              <width>1.0</width>
+              <temperature>1.0</temperature>
+              <shelves>
+                <head>
+                  <depth>2</depth>
+                  <content class="main.supermarketComponents.Shelf">
+                    <number>1</number>
+                    <goods>
+                      <size>0</size>
+                    </goods>
+                  </content>
+                </head>
+                <size>1</size>
+              </shelves>
+            </content>
+          </head>
+          <size>1</size>
+        </aisles>
+      </content>
+    </head>
+    <size>1</size>
+  </main.linkedList.BaoList>
+</object-stream>
