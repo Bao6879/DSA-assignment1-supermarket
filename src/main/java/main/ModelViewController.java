@@ -1,7 +1,6 @@
 package main;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -16,8 +15,6 @@ import main.linkedList.BaoList;
 import main.linkedList.BaoNode;
 import main.supermarketComponents.*;
 
-import java.awt.event.ActionEvent;
-
 public class ModelViewController {
 
     //Back end
@@ -25,23 +22,27 @@ public class ModelViewController {
     private BaoList currentPath=new BaoList();
     private BaoNode considering;
     private MainApplication mainApp;
+    private boolean inSearch=false;
 
     //General
     public TreeView <String> treeView=new TreeView<>();
     public Canvas canvas;
     public GraphicsContext gc;
     public Label comment;
+    public ScrollPane canvasPane;
     private final int floorAreaSize=100, aisleBoxWidth=70, aisleBoxLength=150, shelfWidth=150, shelfLength=70, goodsSize=50;
 
     //Action
-    public AnchorPane action;
+    public AnchorPane action, deletePane;
     public Button visit, delete, edit, info;
     public Label actionLabel;
+    public TextField deleteCount;
 
     //Search
-    public AnchorPane search;
+    public AnchorPane search, searchResult;
     public TextField searchField;
     public Button searchButton;
+    public ListView <String> listView;
 
     //Smart Add
     public AnchorPane smartAdd;
@@ -115,11 +116,9 @@ public class ModelViewController {
     ///Adding
     public void addFloorArea()
     {
-        String name=floorAreaName.getText().trim();
-        String level=floorAreaLevel.getText().trim();
-        if (!Utilities.checkStringInvalidInteger(level, comment))
+        FloorArea tmp=getFloorAreaFromInput();
+        if (tmp!=null)
         {
-            FloorArea tmp=new FloorArea(name, Integer.parseInt(level));
             if (baoList.searchNode(new BaoNode<>(tmp))!=null)
             {
                 comment.setText("This floor area already exists!");
@@ -130,14 +129,11 @@ public class ModelViewController {
             populateTree();
         }
     }
-
     public void addAisle()
     {
-        String name=aisleName.getText().trim(), length=aisleLength.getText().trim(), width=aisleWidth.getText().trim();
-        String temperature=aisleTemperature.getSelectionModel().getSelectedItem();
-        if (!Utilities.checkStringInvalidDouble(length, comment) && !Utilities.checkStringInvalidDouble(width, comment))
+        Aisle tmp=getAisleFromInput();
+        if (tmp!=null)
         {
-            Aisle tmp=new Aisle(name, Double.parseDouble(length), Double.parseDouble(width), temperature);
             if (fullSearch(new BaoNode<>(tmp))!=null)
             {
                 comment.setText("This aisle already exists!");
@@ -148,13 +144,11 @@ public class ModelViewController {
             populateTree();
         }
     }
-
     public void addShelf()
     {
-        String number=shelfNumber.getText().trim();
-        if (!Utilities.checkStringInvalidInteger(number, comment))
+        Shelf tmp=getShelfFromInput();
+        if (tmp!=null)
         {
-            Shelf tmp=new Shelf(Integer.parseInt(number));
             BaoNode temp=currentPath.getNode(1);
             if (((Components)temp.getContent()).getInnerList().searchNode(new BaoNode<>(tmp))!=null)
             {
@@ -166,18 +160,15 @@ public class ModelViewController {
             populateTree();
         }
     }
-
     public void addGoods()
     {
-        String name=goodsName.getText().trim(), description=goodsDescription.getText().trim(), weight=goodsWeight.getText().trim(), price=goodsPrice.getText().trim(), quantity=goodsQuantity.getText().trim(), image=goodsImage.getText().trim();
-        String temperature=goodsTemperature.getSelectionModel().getSelectedItem();
-        if (!Utilities.checkStringInvalidDouble(weight, comment) && !Utilities.checkStringInvalidDouble(price, comment) && !Utilities.checkStringInvalidInteger(quantity, comment))
+        Goods tmp=getGoodsFromInput();
+        if (tmp!=null)
         {
-            Goods tmp=new Goods(name, description, Double.parseDouble(weight), Double.parseDouble(price), Integer.parseInt(quantity), temperature, image);
             BaoNode temp=currentPath.getNode(2);
             if (((Components)temp.getContent()).getInnerList().searchNode(new BaoNode<>(tmp))!=null)
             {
-                ((Goods)((Components)temp.getContent()).getInnerList().searchNode(new BaoNode<>(tmp)).getContent()).setQuantity(Integer.parseInt(quantity)+((Goods)((Components)temp.getContent()).getInnerList().searchNode(new BaoNode<>(tmp)).getContent()).getQuantity());
+                ((Goods)((Components)temp.getContent()).getInnerList().searchNode(new BaoNode<>(tmp)).getContent()).setQuantity(tmp.getQuantity()+((Goods)((Components)temp.getContent()).getInnerList().searchNode(new BaoNode<>(tmp)).getContent()).getQuantity());
                 comment.setText("Added to existing goods!");
                 populateTree();
                 return;
@@ -215,17 +206,46 @@ public class ModelViewController {
 
     public void delete()
     {
-
+        if (currentPath.getSize()==0)
+            baoList.removeNode(considering);
+        else if (currentPath.getSize()!=3)
+            ((Components)findNodeByPath(currentPath, currentPath.getNode(currentPath.getSize()-1)).getContent()).getInnerList().removeNode(considering);
+        else
+        {
+            BaoNode temp=((Components)findNodeByPath(currentPath, currentPath.getNode(2)).getContent()).getInnerList().searchNode(considering);
+            String count=deleteCount.getText().trim();
+            if (!Utilities.checkStringInvalidInteger(count, comment)) {
+                if (((Goods) temp.getContent()).getQuantity() <Integer.parseInt(count)) {
+                    ((Components) findNodeByPath(currentPath, currentPath.getNode(2)).getContent()).getInnerList().removeNode(considering);
+                    comment.setText("Deletion Successful!");
+                }
+                else {
+                    ((Goods) temp.getContent()).setQuantity(Integer.parseInt(count) + ((Goods) temp.getContent()).getQuantity());
+                    comment.setText("Removed "+count+" items!");
+                }
+            }
+        }
+        if (currentPath.getSize()!=3)
+            comment.setText("Deletion Successful!");
+        populateTree();
     }
 
     public void edit()
     {
-
+        switch (currentPath.getSize())
+        {
+            case 0 -> baoList.searchNode(considering).setContent(getFloorAreaFromInput());
+            case 1 -> ((Components)findNodeByPath(currentPath, currentPath.getNode(0)).getContent()).getInnerList().searchNode(new BaoNode<>(considering)).setContent(getAisleFromInput());
+            case 2 -> ((Components)findNodeByPath(currentPath, currentPath.getNode(1)).getContent()).getInnerList().searchNode(new BaoNode<>(considering)).setContent(getShelfFromInput());
+            case 3 -> ((Components)findNodeByPath(currentPath, currentPath.getNode(2)).getContent()).getInnerList().searchNode(new BaoNode<>(considering)).setContent(getGoodsFromInput());
+        }
+        comment.setText("Edit successful! If nothing changed, you need to change the content from the add tab!");
+        populateTree();
     }
 
     public void info()
     {
-
+        //TODO DO I NEED TO DO THIS
     }
 
     public void back()
@@ -234,34 +254,86 @@ public class ModelViewController {
             comment.setText("There is no higher place to go to.");
             return;
         }
-        currentPath.removeNode(currentPath.getNode(currentPath.getSize()-1));
+        if (!inSearch)
+            currentPath.removeNode(currentPath.getNode(currentPath.getSize()-1));
+        else {
+            inSearch = false;
+            searchResult.setDisable(true);
+            searchResult.setVisible(false);
+            canvasPane.setDisable(false);
+            canvasPane.setVisible(true);
+        }
         switch (currentPath.getSize())
         {
             case 0 -> showFloorAreas();
             case 1 -> showAisles();
             case 2 -> showShelves();
+            case 3 -> showGoods();
         }
         populateTree();
     }
 
     public void addView()
     {
-
+        hideAllPanes();
+        if (inSearch) {
+            inSearch = false;
+            searchResult.setDisable(true);
+            searchResult.setVisible(false);
+            canvasPane.setDisable(false);
+            canvasPane.setVisible(true);
+        }
+        switch (currentPath.getSize())
+        {
+            case 0 -> showFloorAreas();
+            case 1 -> showAisles();
+            case 2 -> showShelves();
+            case 3 -> showGoods();
+        }
+        populateTree();
     }
 
     public void searchView()
     {
-
+        hideAllPanes();
+        search.setVisible(true);
     }
 
     public void smartAddView()
     {
-
+        hideAllPanes();
+        smartAdd.setVisible(true);
     }
 
     public void searchGood()
     {
-
+        String name=searchField.getText().strip();
+        int count=1;
+        BaoList <String> list=new BaoList<>();
+        for (FloorArea floorArea: baoList) {
+            for (Aisle aisle : floorArea.getInnerList()) {
+                for (Shelf shelf : aisle.getInnerList()) {
+                    for (Goods goods : shelf.getInnerList()) {
+                        if (goods.getName().equals(name)) {
+                            list.addNode(new BaoNode<>("Found occurrence " + count + " at:\nFloor Area " + floorArea.getName() + ", Aisle " + aisle.getName()
+                                    + ", Shelf " + shelf.getName() + "!"));
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+        canvasPane.setVisible(false);
+        canvasPane.setDisable(true);
+        searchResult.setDisable(false);
+        searchResult.setVisible(true);
+        listView.setVisible(true);
+        listView.setDisable(false);
+        listView.getItems().clear();
+        for (String s: list)
+            listView.getItems().add(s);
+        comment.setText("Found "+(count-1)+" occurrences! Click add or back to go back!");
+        inSearch=true;
     }
 
     public void smartAdd()
@@ -341,6 +413,11 @@ public class ModelViewController {
     {
         hideAllPanes();
         action.setVisible(true);
+    }
+    public void showDelete()
+    {
+        hideAllPanes();
+        deletePane.setVisible(true);
     }
     public void showFloorAreas()
     {
@@ -479,6 +556,7 @@ public class ModelViewController {
         smartAdd.setVisible(false);
         search.setVisible(false);
         action.setVisible(false);
+        deletePane.setVisible(false);
     }
     public void checkKeyPressed(KeyEvent e)
     {
@@ -491,6 +569,45 @@ public class ModelViewController {
                 case 3 -> addGoods();
             }
         }
+    }
+    private FloorArea getFloorAreaFromInput()
+    {
+        String name=floorAreaName.getText().trim();
+        String level=floorAreaLevel.getText().trim();
+        if (Utilities.checkStringInvalidInteger(level, comment))
+        {
+            return null;
+        }
+        return new FloorArea(name, Integer.parseInt(level));
+    }
+    private Aisle getAisleFromInput()
+    {
+        String name=aisleName.getText().trim(), length=aisleLength.getText().trim(), width=aisleWidth.getText().trim();
+        String temperature=aisleTemperature.getSelectionModel().getSelectedItem();
+        if (!Utilities.checkStringInvalidDouble(length, comment) && !Utilities.checkStringInvalidDouble(width, comment))
+        {
+            return new Aisle(name, Double.parseDouble(length), Double.parseDouble(width), temperature);
+        }
+        return null;
+    }
+    private Shelf getShelfFromInput()
+    {
+        String number=shelfNumber.getText().trim();
+        if (!Utilities.checkStringInvalidInteger(number, comment))
+        {
+            return new Shelf(Integer.parseInt(number));
+        }
+        return null;
+    }
+    private Goods getGoodsFromInput()
+    {
+        String name=goodsName.getText().trim(), description=goodsDescription.getText().trim(), weight=goodsWeight.getText().trim(), price=goodsPrice.getText().trim(), quantity=goodsQuantity.getText().trim(), image=goodsImage.getText().trim();
+        String temperature=goodsTemperature.getSelectionModel().getSelectedItem();
+        if (!Utilities.checkStringInvalidDouble(weight, comment) && !Utilities.checkStringInvalidDouble(price, comment) && !Utilities.checkStringInvalidInteger(quantity, comment))
+        {
+            return new Goods(name, description, Double.parseDouble(weight), Double.parseDouble(price), Integer.parseInt(quantity), temperature, image);
+        }
+        return null;
     }
     private BaoNode <?> findNodeByPath(BaoList <?> path, BaoNode <?> node)
     {
