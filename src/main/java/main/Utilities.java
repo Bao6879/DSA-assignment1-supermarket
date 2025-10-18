@@ -151,10 +151,8 @@ public class Utilities {
         currentPosition+=width.length()+1;
 
         temperature=Utilities.extractElement(aisle.substring(currentPosition));
-        if (Utilities.checkStringInvalidDouble(temperature, comment))
-            return null;
 
-        return new Aisle(name.trim(), Double.parseDouble(length.trim()), Double.parseDouble(width.trim()), Double.parseDouble(temperature.trim()));
+        return new Aisle(name.trim(), Double.parseDouble(length.trim()), Double.parseDouble(width.trim()), temperature.trim());
     }
 
     public static Shelf getShelfFromString(String shelf, Label comment)
@@ -193,13 +191,11 @@ public class Utilities {
         currentPosition+=quantity.length()+1;
 
         temperature=Utilities.extractAttribute(goods.substring(currentPosition));
-        if (Utilities.checkStringInvalidDouble(temperature, comment))
-            return null;
         currentPosition+=temperature.length()+1;
 
         image=Utilities.extractElement(goods.substring(currentPosition));
 
-        return new Goods(name.trim(), description.trim(), Double.parseDouble(weight.trim()), Double.parseDouble(price.trim()), Integer.parseInt(quantity.trim()), Double.parseDouble(temperature.trim()), image.trim());
+        return new Goods(name.trim(), description.trim(), Double.parseDouble(weight.trim()), Double.parseDouble(price.trim()), Integer.parseInt(quantity.trim()), temperature.trim(), image.trim());
     }
 
     public static BaoList copyList(BaoList list)

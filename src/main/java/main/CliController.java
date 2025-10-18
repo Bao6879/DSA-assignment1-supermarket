@@ -98,9 +98,9 @@ public class CliController {
         switch (currentPath.getSize())
         {
             case 0 -> instruction.setText("Floor Area Format: STRING (title), INT (level); REPEAT");
-            case 1 -> instruction.setText("Aisle Format: STRING (name), DOUBLE (length), DOUBLE (width), DOUBLE (temperature); REPEAT");
+            case 1 -> instruction.setText("Aisle Format: STRING (name), DOUBLE (length), DOUBLE (width), String (temperature); REPEAT");
             case 2 -> instruction.setText("Shelf Format: INT (number); REPEAT");
-            case 3 -> instruction.setText("Goods Format: STRING (name), STRING (description), DOUBLE (weight), DOUBLE (price), INT (quantity), DOUBLE (temperature); REPEAT");
+            case 3 -> instruction.setText("Goods Format: STRING (name), STRING (description), DOUBLE (weight), DOUBLE (price), INT (quantity), String (temperature); REPEAT");
         }
     }
 
@@ -380,7 +380,7 @@ public class CliController {
             searchView.setPrefHeight(100);
             searchView.setPrefWidth(100);
             comment.setText("Found "+(count-1)+" occurrences!");
-            pos=new BaoNode<>(new Goods("", "", 0, 0, 0, 0, ""));
+            pos=new BaoNode<>(new Goods("", "", 0, 0, 0, "", ""));
         }
         else if (choice.equals("Reset")) {
             if (rootField.getText().equals("I am sure")) {
@@ -702,7 +702,7 @@ public class CliController {
         if (node.getDepth()==0)
             return null;
         BaoNode cmpNode = new BaoNode(null);
-        Components retNode=new Goods("", "", 0, 0, 0, 0, "");
+        Components retNode=new Goods("", "", 0, 0, 0, "", "");
         double similarScore=Double.MAX_VALUE;
         for (FloorArea floorArea: baoList)
         {

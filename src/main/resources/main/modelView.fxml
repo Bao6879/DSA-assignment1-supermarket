@@ -7,10 +7,10 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -32,30 +32,9 @@
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                            <children>
-                              <SplitPane dividerPositions="0.1895161290322581, 0.22479838709677422" layoutX="98.0" layoutY="67.0" orientation="VERTICAL" prefHeight="676.8" prefWidth="1077.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <SplitPane dividerPositions="0.17950236966824643, 0.24318720379146916" layoutX="98.0" layoutY="67.0" orientation="VERTICAL" prefHeight="676.8" prefWidth="1077.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <items>
                                     <DialogPane>
-                                       <header>
-                                          <MenuBar>
-                                            <menus>
-                                              <Menu mnemonicParsing="false" text="Add">
-                                                <items>
-                                                  <MenuItem mnemonicParsing="false" text="Close" />
-                                                </items>
-                                              </Menu>
-                                              <Menu mnemonicParsing="false" text="Search">
-                                                <items>
-                                                  <MenuItem mnemonicParsing="false" text="Delete" />
-                                                </items>
-                                              </Menu>
-                                              <Menu mnemonicParsing="false" text="Smart Add">
-                                                <items>
-                                                  <MenuItem mnemonicParsing="false" text="About" />
-                                                </items>
-                                              </Menu>
-                                            </menus>
-                                          </MenuBar>
-                                       </header>
                                        <content>
                                           <StackPane>
                                              <children>
@@ -90,12 +69,12 @@
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Button>
-                                                      <TextField fx:id="aisleName" layoutX="38.0" layoutY="62.0" prefHeight="46.0" prefWidth="161.0" promptText="Name of the Aisle">
+                                                      <TextField fx:id="aisleName" layoutX="38.0" layoutY="62.0" onKeyPressed="#checkKeyPressed" prefHeight="46.0" prefWidth="161.0" promptText="Name of the Aisle">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
                                                       </TextField>
-                                                      <TextField fx:id="aisleLength" layoutX="252.0" layoutY="62.0" prefHeight="46.0" prefWidth="161.0" promptText="Length of the Aisle">
+                                                      <TextField fx:id="aisleLength" layoutX="252.0" layoutY="62.0" onKeyPressed="#checkKeyPressed" prefHeight="46.0" prefWidth="161.0" promptText="Length of the Aisle">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
@@ -105,7 +84,7 @@
                                                             <Font size="30.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="aisleWidth" layoutX="483.0" layoutY="62.0" prefHeight="46.0" prefWidth="161.0" promptText="Width of the Aisle">
+                                                      <TextField fx:id="aisleWidth" layoutX="483.0" layoutY="62.0" onKeyPressed="#checkKeyPressed" prefHeight="46.0" prefWidth="161.0" promptText="Width of the Aisle">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
@@ -120,7 +99,7 @@
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Button>
-                                                      <TextField fx:id="shelfNumber" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of the floor area">
+                                                      <TextField fx:id="shelfNumber" layoutX="92.0" layoutY="62.0" onKeyPressed="#checkKeyPressed" prefHeight="46.0" prefWidth="258.0" promptText="Number of the Shelf">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
@@ -139,7 +118,7 @@
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Button>
-                                                      <TextField fx:id="searchField" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of the floor area">
+                                                      <TextField fx:id="searchField" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of item to search for">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
@@ -158,7 +137,7 @@
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Button>
-                                                      <TextField fx:id="searchField1" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of the floor area">
+                                                      <TextField fx:id="searchField1" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="s">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
@@ -199,28 +178,64 @@
                                                       </Button>
                                                    </children>
                                                 </AnchorPane>
-                                                <AnchorPane fx:id="goodsAdd" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
+                                                <AnchorPane fx:id="goodsAdd" minHeight="0.0" minWidth="0.0" prefHeight="266.0" prefWidth="1054.0" visible="false">
                                                    <children>
-                                                      <Button fx:id="smartAddButton1" layoutX="882.0" layoutY="62.0" mnemonicParsing="false" onAction="#smartAdd" prefHeight="46.0" prefWidth="172.0" text="Add Smartly!">
+                                                      <Button fx:id="goodsButton" layoutX="968.0" layoutY="62.0" mnemonicParsing="false" onAction="#addGoods" prefHeight="46.0" prefWidth="172.0" text="Add!">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Button>
-                                                      <TextField fx:id="searchField11" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of the floor area">
+                                                      <TextField fx:id="goodsName" layoutX="14.0" layoutY="8.0" prefHeight="46.0" prefWidth="265.0" promptText="Name of the item">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
                                                       </TextField>
-                                                      <Label alignment="CENTER" layoutX="332.0" prefHeight="18.0" prefWidth="503.0" text="Add an item smartly!">
+                                                      <Label alignment="CENTER" layoutX="304.0" layoutY="8.0" prefHeight="18.0" prefWidth="503.0" text="Add a goods item!">
                                                          <font>
                                                             <Font size="30.0" />
                                                          </font>
                                                       </Label>
+                                                      <ChoiceBox fx:id="goodsTemperature" layoutX="737.0" layoutY="8.0" prefHeight="46.0" prefWidth="205.0" />
+                                                      <TextField fx:id="goodsImage" layoutX="572.0" layoutY="62.0" prefHeight="46.0" prefWidth="377.0" promptText="Image URL">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="goodsPrice" layoutX="996.0" layoutY="8.0" prefHeight="46.0" prefWidth="135.0" promptText="Price">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="goodsQuantity" layoutX="303.0" layoutY="8.0" prefHeight="46.0" prefWidth="98.0" promptText="Quantity">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="goodsWeight" layoutX="434.0" layoutY="62.0" prefHeight="46.0" prefWidth="122.0" promptText="Weight">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="goodsDescription" layoutX="14.0" layoutY="62.0" prefHeight="46.0" prefWidth="390.0" promptText="Description of the item">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
                                                    </children>
                                                 </AnchorPane>
                                              </children>
                                           </StackPane>
                                        </content>
+                                       <header>
+                                          <ToolBar prefHeight="40.0" prefWidth="200.0">
+                                            <items>
+                                              <Button minWidth="95.0" mnemonicParsing="false" onAction="#addView" prefHeight="35.0" prefWidth="95.0" text="Add" />
+                                                <Button minWidth="95.0" mnemonicParsing="false" onAction="#searchView" prefHeight="35.0" prefWidth="95.0" text="Search" />
+                                                <Button minWidth="95.0" mnemonicParsing="false" onAction="#smartAddView" prefHeight="35.0" prefWidth="95.0" text="Smart Add" />
+                                                <Button minWidth="95.0" mnemonicParsing="false" onAction="#back" prefHeight="35.0" prefWidth="95.0" text="Back" />
+                                            </items>
+                                          </ToolBar>
+                                       </header>
                                     </DialogPane>
                                     <AnchorPane prefHeight="26.0" prefWidth="546.0">
                                        <children>
@@ -233,7 +248,7 @@
                                     </AnchorPane>
                                     <ScrollPane prefHeight="200.0" prefWidth="200.0">
                                        <content>
-                                          <Canvas fx:id="canvas" height="520.0" onMousePressed="#canvasPressed" width="1076.0" />
+                                          <Canvas fx:id="canvas" height="700.0" onMousePressed="#canvasPressed" width="1200.0" />
                                        </content>
                                     </ScrollPane>
                                 </items>

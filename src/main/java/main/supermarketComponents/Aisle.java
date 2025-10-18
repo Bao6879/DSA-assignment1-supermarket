@@ -7,10 +7,10 @@ import main.linkedList.BaoNode;
 import java.util.Objects;
 
 public class Aisle extends Components{
-    private String name;
-    private double length, width, temperature;
+    private String name, temperature;
+    private double length, width;
     private BaoList <Shelf> shelves;
-    public Aisle(String name, double length, double width, double temperature) {
+    public Aisle(String name, double length, double width, String temperature) {
         setName(name);
         setLength(length);
         setWidth(width);
@@ -43,11 +43,11 @@ public class Aisle extends Components{
         this.width = width;
     }
 
-    public double getTemperature() {
+    public String getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(String  temperature) {
         this.temperature = temperature;
     }
 
@@ -67,7 +67,7 @@ public class Aisle extends Components{
         if (other==null)
             return Double.MAX_VALUE-1;
         Aisle otherAisle = (Aisle) other;
-        double difference=Math.abs(getLength()-otherAisle.getLength())+Math.abs(getWidth()-otherAisle.getWidth())+Math.abs(getTemperature()-otherAisle.getTemperature());
+        double difference=Math.abs(getLength()-otherAisle.getLength())+Math.abs(getWidth()-otherAisle.getWidth())+Math.abs(getTemperature().length()-otherAisle.getTemperature().length());
         difference+=Math.abs(otherAisle.getName().length()-getName().length());
         for (int i=0; i<Math.min(getName().length(), otherAisle.getName().length()); i++)
             if (getName().charAt(i)!=otherAisle.getName().charAt(i))

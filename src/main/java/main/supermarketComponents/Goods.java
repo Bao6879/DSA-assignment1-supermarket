@@ -7,11 +7,11 @@ import main.linkedList.BaoNode;
 import java.util.Objects;
 
 public class Goods extends Components {
-    private String description, name;
-    private double price, weight, temperature;
+    private String description, name, temperature;
+    private double price, weight;
     private int quantity;
     private String imageUrl;
-    public Goods(String name, String description, double weight, double price, int quantity, double temperature, String imageUrl) {
+    public Goods(String name, String description, double weight, double price, int quantity, String temperature, String imageUrl) {
         setName(name);
         setDescription(description);
         setPrice(price);
@@ -62,11 +62,11 @@ public class Goods extends Components {
         this.quantity = quantity;
     }
 
-    public double getTemperature() {
+    public String getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(String temperature) {
         this.temperature = temperature;
     }
 
@@ -83,7 +83,7 @@ public class Goods extends Components {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Goods goods = (Goods) o;
-        return Double.compare(price, goods.price) == 0 && Double.compare(weight, goods.weight) == 0 && Double.compare(temperature, goods.temperature) == 0 && Objects.equals(description, goods.description) && Objects.equals(name, goods.name) && Objects.equals(imageUrl, goods.imageUrl);
+        return Double.compare(price, goods.price) == 0 && Double.compare(weight, goods.weight) == 0 && Objects.equals(temperature, goods.temperature) && Objects.equals(description, goods.description) && Objects.equals(name, goods.name) && Objects.equals(imageUrl, goods.imageUrl);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class Goods extends Components {
         if (other==null)
             return Double.MAX_VALUE-1;
         Goods otherGoods = (Goods) other;
-        double difference=Math.abs(otherGoods.getWeight()-getWeight())+Math.abs(otherGoods.getPrice()-getPrice())+Math.abs(otherGoods.getTemperature()-getTemperature());
+        double difference=Math.abs(otherGoods.getWeight()-getWeight())+Math.abs(otherGoods.getPrice()-getPrice())+Math.abs(otherGoods.getTemperature().length()-getTemperature().length());
         difference+=Math.abs(otherGoods.getName().length()-getName().length());
         for (int i=0; i<Math.min(getName().length(), otherGoods.getName().length()); i++)
             if (getName().charAt(i)!=otherGoods.getName().charAt(i))
