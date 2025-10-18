@@ -11,7 +11,7 @@ public class BaoList <E> implements Iterable <E>{
     public BaoList() {
 
     }
-    public void addNode(BaoNode <E> node1) {
+    public void addNode(BaoNode <E> node1) {  //ADD AN E
         if (node1 == null)
             return;
         size++;
@@ -27,7 +27,7 @@ public class BaoList <E> implements Iterable <E>{
         newNode.setNext(node);
         node.setPrev(newNode);
     }
-    public void removeNode(BaoNode <E> node) {
+    public void removeNode(BaoNode <E> node) { //ADD AN E
         BaoNode <E> delNode = searchNode(node);
         if (delNode == null) {
             return;

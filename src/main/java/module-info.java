@@ -13,6 +13,7 @@ module main {
     requires java.desktop;
     requires annotations;
     requires xstream;
+    requires jdk.compiler;
 
     opens main to javafx.fxml;
     opens main.supermarketComponents to xstream;

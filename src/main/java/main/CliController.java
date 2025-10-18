@@ -1,6 +1,5 @@
 package main;
 
-import javafx.beans.value.ChangeListener;
 import main.linkedList.BaoList;
 import main.linkedList.BaoNode;
 import main.supermarketComponents.*;
@@ -18,9 +17,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.List;
 
-public class MainController {
+public class CliController {
 
     //Floor Area
     public TableView <FloorArea> floorAreaTable;
@@ -57,9 +55,14 @@ public class MainController {
     public ListView <String> searchView;
 
     //Back end
-    private BaoList <FloorArea> baoList=new BaoList<>();
+    public BaoList <FloorArea> baoList=new BaoList<>();
+    private MainApplication mainApp;
     private BaoList currentList=new BaoList<>(), currentPath=new BaoList<>();
     private BaoNode pos;
+
+    public void setMainApp(MainApplication mainApp) {
+        this.mainApp = mainApp;
+    }
 
     @FXML
     private void initialize() {
@@ -333,6 +336,7 @@ public class MainController {
                     }
                     else {
                         similar.getInnerList().addNode(new BaoNode<>(temp));
+                        goodsTable.getItems().add(temp); //0 indexed
                         location+=similar.getName()+"; ";
                     }
                 }
@@ -357,7 +361,7 @@ public class MainController {
                         {
                             if (goods.getName().equals(search))
                             {
-                                list.addNode(new BaoNode<>("Found occurrence "+count+"at:\nFloor Area "+floorArea.getName()+", Aisle "+aisle.getName()
+                                list.addNode(new BaoNode<>("Found occurrence "+count+" at:\nFloor Area "+floorArea.getName()+", Aisle "+aisle.getName()
                                 +", Shelf "+shelf.getName()+"!"));
                                 count++;
                             }
@@ -514,7 +518,8 @@ public class MainController {
                     }
                 }
             }
-            tableView.getItems().remove(tmp.getContent());
+            if (!(tmp.getContent() instanceof Goods))
+                tableView.getItems().remove(tmp.getContent());
         });
         return delete;
     }
@@ -577,8 +582,10 @@ public class MainController {
 
     @FXML
     private void backAction(ActionEvent event) {
-        if (pos==null)
+        if (pos==null) {
+            mainApp.switchScene();
             return;
+        }
         boolean isSearch=false;
         if (pos.getContent() instanceof FloorArea) {
             pos=null;

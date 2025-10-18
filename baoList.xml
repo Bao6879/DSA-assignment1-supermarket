@@ -17,9 +17,47 @@
                 <head>
                   <depth>2</depth>
                   <content class="main.supermarketComponents.Shelf">
-                    <number>1</number>
+                    <number>10</number>
                     <goods>
-                      <size>0</size>
+                      <head>
+                        <next>
+                          <next>
+                            <prev reference="../.."/>
+                            <depth>3</depth>
+                            <content class="main.supermarketComponents.Goods">
+                              <description>super mao</description>
+                              <name>lao</name>
+                              <price>10.0</price>
+                              <weight>15.0</weight>
+                              <temperature>30.0</temperature>
+                              <quantity>10</quantity>
+                              <imageUrl>random</imageUrl>
+                            </content>
+                          </next>
+                          <prev reference="../.."/>
+                          <depth>3</depth>
+                          <content class="main.supermarketComponents.Goods">
+                            <description>ultra lmao</description>
+                            <name>lmao</name>
+                            <price>11.0</price>
+                            <weight>10.0</weight>
+                            <temperature>20.0</temperature>
+                            <quantity>10</quantity>
+                            <imageUrl>randomurl1</imageUrl>
+                          </content>
+                        </next>
+                        <depth>3</depth>
+                        <content class="main.supermarketComponents.Goods">
+                          <description>super lmao</description>
+                          <name>lmao</name>
+                          <price>10.0</price>
+                          <weight>10.0</weight>
+                          <temperature>10.0</temperature>
+                          <quantity>10</quantity>
+                          <imageUrl>randomurl</imageUrl>
+                        </content>
+                      </head>
+                      <size>3</size>
                     </goods>
                   </content>
                 </head>

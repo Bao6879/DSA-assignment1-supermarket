@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="699.0" prefWidth="1177.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.ModelViewController">
+   <children>
+      <BorderPane prefHeight="420.8" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <AnchorPane BorderPane.alignment="CENTER">
+               <children>
+                  <SplitPane dividerPositions="0.08054812834224598" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                           <children>
+                              <TreeView fx:id="treeView" layoutX="-13.0" layoutY="80.0" prefHeight="398.4" prefWidth="45.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                           <children>
+                              <SplitPane dividerPositions="0.1895161290322581, 0.22479838709677422" layoutX="98.0" layoutY="67.0" orientation="VERTICAL" prefHeight="676.8" prefWidth="1077.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <items>
+                                    <DialogPane>
+                                       <header>
+                                          <MenuBar>
+                                            <menus>
+                                              <Menu mnemonicParsing="false" text="Add">
+                                                <items>
+                                                  <MenuItem mnemonicParsing="false" text="Close" />
+                                                </items>
+                                              </Menu>
+                                              <Menu mnemonicParsing="false" text="Search">
+                                                <items>
+                                                  <MenuItem mnemonicParsing="false" text="Delete" />
+                                                </items>
+                                              </Menu>
+                                              <Menu mnemonicParsing="false" text="Smart Add">
+                                                <items>
+                                                  <MenuItem mnemonicParsing="false" text="About" />
+                                                </items>
+                                              </Menu>
+                                            </menus>
+                                          </MenuBar>
+                                       </header>
+                                       <content>
+                                          <StackPane>
+                                             <children>
+                                              <AnchorPane fx:id="floorAreaAdd" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0">
+                                                   <children>
+                                                      <Button fx:id="floorAreaButton" layoutX="954.0" layoutY="63.0" mnemonicParsing="false" onAction="#addFloorArea" prefHeight="43.0" prefWidth="172.0" text="Add!">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <TextField fx:id="floorAreaName" layoutX="38.0" layoutY="62.0" onKeyPressed="#checkKeyPressed" prefHeight="46.0" prefWidth="258.0" promptText="Name of the Floor Area">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="floorAreaLevel" layoutX="474.0" layoutY="62.0" onKeyPressed="#checkKeyPressed" prefHeight="46.0" prefWidth="265.0" promptText="Level of the Floor Area">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label alignment="CENTER" layoutX="332.0" prefHeight="18.0" prefWidth="503.0" text="Add a Floor Area!">
+                                                         <font>
+                                                            <Font size="30.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane fx:id="aisleAdd" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
+                                                   <children>
+                                                      <Button fx:id="aisleButton" layoutX="954.0" layoutY="62.0" mnemonicParsing="false" onAction="#addAisle" prefHeight="43.0" prefWidth="172.0" text="Add!">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <TextField fx:id="aisleName" layoutX="38.0" layoutY="62.0" prefHeight="46.0" prefWidth="161.0" promptText="Name of the Aisle">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="aisleLength" layoutX="252.0" layoutY="62.0" prefHeight="46.0" prefWidth="161.0" promptText="Length of the Aisle">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label alignment="CENTER" layoutX="332.0" prefHeight="18.0" prefWidth="503.0" text="Add an Aisle!">
+                                                         <font>
+                                                            <Font size="30.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <TextField fx:id="aisleWidth" layoutX="483.0" layoutY="62.0" prefHeight="46.0" prefWidth="161.0" promptText="Width of the Aisle">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <ChoiceBox fx:id="aisleTemperature" layoutX="712.0" layoutY="62.0" prefHeight="46.0" prefWidth="161.0" />
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane fx:id="shelfAdd" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
+                                                   <children>
+                                                      <Button fx:id="shelfButton" layoutX="882.0" layoutY="62.0" mnemonicParsing="false" onAction="#addShelf" prefHeight="46.0" prefWidth="172.0" text="Add!">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <TextField fx:id="shelfNumber" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of the floor area">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label alignment="CENTER" layoutX="332.0" prefHeight="18.0" prefWidth="503.0" text="Add a Shelf!">
+                                                         <font>
+                                                            <Font size="30.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane fx:id="search" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
+                                                   <children>
+                                                      <Button fx:id="searchButton" layoutX="882.0" layoutY="62.0" mnemonicParsing="false" onAction="#searchGood" prefHeight="46.0" prefWidth="172.0" text="Search!">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <TextField fx:id="searchField" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of the floor area">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label alignment="CENTER" layoutX="332.0" prefHeight="18.0" prefWidth="503.0" text="Search for an item by name!">
+                                                         <font>
+                                                            <Font size="30.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane fx:id="smartAdd" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
+                                                   <children>
+                                                      <Button fx:id="smartAddButton" layoutX="882.0" layoutY="62.0" mnemonicParsing="false" onAction="#smartAdd" prefHeight="46.0" prefWidth="172.0" text="Add Smartly!">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <TextField fx:id="searchField1" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of the floor area">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label alignment="CENTER" layoutX="332.0" prefHeight="18.0" prefWidth="503.0" text="Add an item smartly!">
+                                                         <font>
+                                                            <Font size="30.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane fx:id="action" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
+                                                   <children>
+                                                      <Label fx:id="actionLabel" alignment="CENTER" layoutX="44.0" prefHeight="46.0" prefWidth="956.0" text="What do you want to do?">
+                                                         <font>
+                                                            <Font size="30.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Button fx:id="visit" layoutX="150.0" layoutY="62.0" mnemonicParsing="false" onAction="#visit" prefHeight="46.0" prefWidth="120.0" text="Visit">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="delete" layoutX="400.0" layoutY="62.0" mnemonicParsing="false" onAction="#delete" prefHeight="46.0" prefWidth="120.0" text="Delete">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="edit" layoutX="650.0" layoutY="62.0" mnemonicParsing="false" onAction="#edit" prefHeight="46.0" prefWidth="120.0" text="Edit">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="info" layoutX="900.0" layoutY="62.0" mnemonicParsing="false" onAction="#info" prefHeight="46.0" prefWidth="120.0" text="View Stats">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane fx:id="goodsAdd" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
+                                                   <children>
+                                                      <Button fx:id="smartAddButton1" layoutX="882.0" layoutY="62.0" mnemonicParsing="false" onAction="#smartAdd" prefHeight="46.0" prefWidth="172.0" text="Add Smartly!">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <TextField fx:id="searchField11" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="Name of the floor area">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label alignment="CENTER" layoutX="332.0" prefHeight="18.0" prefWidth="503.0" text="Add an item smartly!">
+                                                         <font>
+                                                            <Font size="30.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </AnchorPane>
+                                             </children>
+                                          </StackPane>
+                                       </content>
+                                    </DialogPane>
+                                    <AnchorPane prefHeight="26.0" prefWidth="546.0">
+                                       <children>
+                                          <Label fx:id="comment" alignment="CENTER" prefHeight="30.4" prefWidth="546.4" text="Comments" textFill="RED" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                    <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                                       <content>
+                                          <Canvas fx:id="canvas" height="520.0" onMousePressed="#canvasPressed" width="1076.0" />
+                                       </content>
+                                    </ScrollPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+         </center>
+         <top>
+            <MenuBar BorderPane.alignment="CENTER">
+              <menus>
+                <Menu mnemonicParsing="false" text="Save" />
+                <Menu mnemonicParsing="false" text="Load" />
+                <Menu mnemonicParsing="false" text="Reset" />
+                  <Menu mnemonicParsing="false" text="View All" />
+                  <Menu mnemonicParsing="false" text="Switch View" />
+              </menus>
+            </MenuBar>
+         </top>
+      </BorderPane>
+   </children>
+</AnchorPane>
