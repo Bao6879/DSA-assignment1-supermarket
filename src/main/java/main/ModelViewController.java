@@ -1,5 +1,7 @@
 package main;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import javafx.fxml.FXML;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -14,6 +16,12 @@ import javafx.scene.text.TextAlignment;
 import main.linkedList.BaoList;
 import main.linkedList.BaoNode;
 import main.supermarketComponents.*;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Optional;
 
 public class ModelViewController {
 
@@ -46,8 +54,8 @@ public class ModelViewController {
 
     //Smart Add
     public AnchorPane smartAdd;
-    public TextField smartAddName, smartAddDescription, smartAddWeight, smartAddPrice, smartAddQuantity, smartAddTemperature, smartAddImage;
-    public Button smartAddButton;
+    public TextField smartAddName, smartAddDescription, smartAddWeight, smartAddPrice, smartAddQuantity, smartAddImage;
+    public ChoiceBox <String> smartAddTemperature;
 
     //Floor Area
     public AnchorPane floorAreaAdd;
@@ -79,6 +87,9 @@ public class ModelViewController {
 
         goodsTemperature.getItems().addAll("Unrefrigerated", "Refrigerated", "Frozen");
         goodsTemperature.getSelectionModel().selectFirst();
+
+        smartAddTemperature.getItems().addAll("Unrefrigerated", "Refrigerated", "Frozen");
+        smartAddTemperature.getSelectionModel().selectFirst();
     }
 
     public void populateTree(){
@@ -177,6 +188,18 @@ public class ModelViewController {
             comment.setText("Goods added successfully!");
             populateTree();
         }
+    }
+    ///Menu
+    public void viewAll()
+    {
+        mainApp.viewAllController.baoList=baoList;
+        mainApp.viewAllController.viewAll();
+        mainApp.switchScene("view");
+    }
+    public void cli()
+    {
+        mainApp.cliController.baoList=baoList;
+        mainApp.switchScene("cli");
     }
 
     ///Action
@@ -336,9 +359,191 @@ public class ModelViewController {
         inSearch=true;
     }
 
+    public void saveData()
+    {
+        try {
+            save();
+            comment.setText("Saved to baoList.xml!");
+        }
+        catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public void loadData()
+    {
+        try {
+            load();
+            currentPath.clear();
+            hideAllPanes();
+            showFloorAreas();
+            populateTree();
+            comment.setText("Loaded from baoList.xml!");
+        }
+        catch (Exception e) {
+            System.err.println("Error reading from file!");
+        }
+    }
+
+    public void resetData()
+    {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Reset");
+        alert.setHeaderText("Reset All Data");
+        alert.setContentText("Are you sure you want to reset all data? This action cannot be undone.");
+
+        Optional<ButtonType> result=alert.showAndWait();
+
+        if (result.isPresent() && result.get()==ButtonType.OK) {
+            baoList.clear();
+            currentPath.clear();
+            hideAllPanes();
+            showFloorAreas();
+            populateTree();
+            comment.setText("System reset successfully. All data cleared.");
+        } else {
+            comment.setText("Reset cancelled.");
+        }
+    }
+
     public void smartAdd()
     {
+        String name=smartAddName.getText().trim(), description=smartAddDescription.getText().trim(), weight=smartAddWeight.getText().trim(), price=smartAddPrice.getText().trim(), quantity=smartAddQuantity.getText().trim(), image=smartAddImage.getText().trim();
+        String temperature=smartAddTemperature.getSelectionModel().getSelectedItem();
+        if (!Utilities.checkStringInvalidDouble(weight, comment) && !Utilities.checkStringInvalidDouble(price, comment) && !Utilities.checkStringInvalidInteger(quantity, comment))
+        {
+            Goods item=new Goods(name, description, Double.parseDouble(weight), Double.parseDouble(price), Integer.parseInt(quantity), temperature, image);
+            if (fullSearch(new BaoNode<>(item))!=null)
+            {
+                comment.setText("Added to existing item!");
+                ((Goods)fullSearch(new BaoNode<>(item)).getContent()).setQuantity(Integer.parseInt(quantity)+((Goods)fullSearch(new BaoNode<>(item)).getContent()).getQuantity());
+                return;
+            }
+            BaoList defaultPlacement=new BaoList<>();
+            for (FloorArea floorArea: baoList) {
+                for (Aisle aisle : floorArea.getInnerList()) {
+                    for (Shelf shelf : aisle.getInnerList()) {
+                        defaultPlacement.addNode(new BaoNode<>(floorArea));
+                        defaultPlacement.addNode(new BaoNode<>(aisle));
+                        defaultPlacement.addNode(new BaoNode<>(shelf));
+                        break;
+                    }
+                    if (defaultPlacement.getSize()!=0)
+                        break;
+                }
+                if (defaultPlacement.getSize()!=0)
+                    break;
+            }
+            if (defaultPlacement.getSize()==0)
+            {
+                comment.setText("No place to put item! Add floor areas, aisles, and shelves first!");
+                return;
+            }
+            BaoList optimalPlacement=new BaoList<>();
+            int maxNameMatches=-1, maxDescriptionMatches=-1;
+            double minPriceDifference=Double.MAX_VALUE, minWeightDifference=Double.MAX_VALUE;
+            for (FloorArea area: baoList) {
+                for (Aisle aisle : area.getInnerList()) {
+                    if (aisle.getTemperature().equals(temperature)) {
+                         for (Shelf shelf : aisle.getInnerList()) {
+                             for (Goods goods : shelf.getInnerList()) {
+                                 String currentName=goods.getName(), currentDescription=goods.getDescription();
+                                 BaoList <String> itemNameTokenized=tokenizeString(name), itemDescriptionTokenized=tokenizeString(description);
+                                 BaoList <String> currentNameTokenized=tokenizeString(currentName), currentDescriptionTokenized=tokenizeString(currentDescription);
+                                 int nameMatches=0, descriptionMatches=0;
+                                 if (itemNameTokenized!=null && currentNameTokenized!=null) {
+                                     for (String token : itemNameTokenized)
+                                         if (currentNameTokenized.contains(token))
+                                             nameMatches++;
+                                     if (nameMatches > maxNameMatches)
+                                     {
+                                         maxNameMatches = nameMatches;
+                                         optimalPlacement.clear();
+                                         optimalPlacement.addNode(new BaoNode<>(area));
+                                         optimalPlacement.addNode(new BaoNode<>(aisle));
+                                         optimalPlacement.addNode(new BaoNode<>(shelf));
+                                         break;
+                                     }
+                                     else if (nameMatches == maxNameMatches)
+                                     {
+                                         if (itemDescriptionTokenized!=null && currentDescriptionTokenized!=null) {
+                                             for (String token: itemDescriptionTokenized)
+                                                 if (currentDescriptionTokenized.contains(token))
+                                                     descriptionMatches++;
+                                         }
+                                         if (descriptionMatches > maxDescriptionMatches)
+                                         {
+                                             maxDescriptionMatches = descriptionMatches;
+                                             optimalPlacement.clear();
+                                             optimalPlacement.addNode(new BaoNode<>(area));
+                                             optimalPlacement.addNode(new BaoNode<>(aisle));
+                                             optimalPlacement.addNode(new BaoNode<>(shelf));
+                                             break;
+                                         }
+                                         else if (descriptionMatches == maxDescriptionMatches)
+                                         {
+                                             if (Math.abs(item.getPrice()-goods.getPrice())<minPriceDifference)
+                                             {
+                                                 minPriceDifference = Math.abs(item.getPrice()-goods.getPrice());
+                                                 optimalPlacement.clear();
+                                                 optimalPlacement.addNode(new BaoNode<>(area));
+                                                 optimalPlacement.addNode(new BaoNode<>(aisle));
+                                                 optimalPlacement.addNode(new BaoNode<>(shelf));
+                                                 break;
+                                             }
+                                             else if (Math.abs(item.getPrice()-goods.getPrice())==minPriceDifference)
+                                             {
+                                                 if (Math.abs(item.getWeight()-goods.getWeight())<minWeightDifference)
+                                                 {
+                                                     minWeightDifference = Math.abs(item.getWeight()-goods.getWeight());
+                                                     optimalPlacement.clear();
+                                                     optimalPlacement.addNode(new BaoNode<>(area));
+                                                     optimalPlacement.addNode(new BaoNode<>(aisle));
+                                                     optimalPlacement.addNode(new BaoNode<>(shelf));
+                                                     break;
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }
+                             }
+                         }
+                    }
+                }
+            }
+            if (optimalPlacement.getSize()!=0)
+            {
+                ((Components)findNodeByPath(optimalPlacement, optimalPlacement.getNode(2)).getContent()).getInnerList().addNode(new BaoNode(item));
+                comment.setText("Item has been added to shelf "+((Components)optimalPlacement.getNode(2).getContent()).getName()+" of aisle "+((Components)optimalPlacement.getNode(1).getContent()).getName()+" of floor area "+((Components)optimalPlacement.getNode(0).getContent()).getName()+"!");
+            }
+            else
+            {
+                ((Components)findNodeByPath(defaultPlacement, defaultPlacement.getNode(2)).getContent()).getInnerList().addNode(new BaoNode(item));
+                comment.setText("Didn't find a suitable place, so item has been added to shelf "+((Components)defaultPlacement.getNode(2).getContent()).getName()+" of aisle "+((Components)defaultPlacement.getNode(1).getContent()).getName()+" of floor area "+((Components)defaultPlacement.getNode(0).getContent()).getName()+"!");
+            }
+        }
+    }
 
+    private BaoList <String> tokenizeString(String s)
+    {
+        BaoList <String> tokens=new BaoList();
+        String tmp;
+        for (int i=0; i<s.length(); i++)
+        {
+            int j=i;
+            tmp="";
+            while (j<s.length() && s.charAt(j)!=' ')
+            {
+                tmp+=s.charAt(j);
+                j++;
+            }
+            i=j;
+            if (!Utilities.skippedWords.contains(tmp) && !tokens.contains(tmp))
+            {
+                tokens.addNode(tmp);
+            }
+        }
+        return tokens;
     }
 
     public void canvasPressed(MouseEvent event)
@@ -652,5 +857,24 @@ public class ModelViewController {
             }
         }
         return null;
+    }
+    public void save() throws Exception {
+        XStream xstream=new XStream(new DomDriver());
+        ObjectOutputStream out=xstream.createObjectOutputStream(new FileWriter("baoList.xml"));
+        out.writeObject(baoList);
+        out.close();
+    }
+    public void load() throws Exception {
+        Class<?>[] classes = new Class[] { BaoNode.class, BaoList.class, Components.class, Aisle.class, Shelf.class, FloorArea.class, Goods.class};
+
+        //setting up the xstream object with default security and the above classes
+        XStream xstream = new XStream(new DomDriver());
+        XStream.setupDefaultSecurity(xstream);
+        xstream.allowTypes(classes);
+
+        //doing the actual serialisation to an XML file
+        ObjectInputStream in = xstream.createObjectInputStream(new FileReader("baoList.xml"));
+        baoList = (BaoList<FloorArea>) in.readObject();
+        in.close();
     }
 }

@@ -44,7 +44,7 @@ public class LinkedListTest {
         assertEquals("Second", list.getNode(1).getContent()); //Already has something
         assertEquals(2, list.getSize());
 
-        list.addNode(null);
+        list.addNode((BaoNode<String>) null);
         assertNull(list.getNode(2)); //Doesn't add null
         assertEquals(2, list.getSize());
 
@@ -96,7 +96,7 @@ public class LinkedListTest {
         assertEquals(second.getContent(), list.searchNode(second).getContent()); //Existing tail
         assertEquals(first.getContent(), list.searchNode(first).getContent()); //Existing head
         assertNull(list.searchNode(third)); //Non-existent node
-        assertNull(list.searchNode(null)); //null node
+        assertNull(list.searchNode((BaoNode<String>) null)); //null node
     }
 
     @Test

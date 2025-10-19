@@ -13,4 +13,5 @@ public abstract class Components {
     public abstract BaoList getInnerList();
     public abstract void setInnerList(BaoList <?> innerList);
     public abstract double similarScore(Components other);
+    public abstract double getValue();
 }

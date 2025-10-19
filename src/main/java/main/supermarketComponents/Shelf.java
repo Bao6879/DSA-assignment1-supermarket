@@ -29,6 +29,14 @@ public class Shelf extends Components {
     }
 
     @Override
+    public double getValue() {
+        double value=0.0;
+        for (Goods item : goods)
+            value+=item.getValue();
+        return value;
+    }
+
+    @Override
     public double similarScore(Components other) {
         if (other==null)
             return Double.MAX_VALUE-1;

@@ -119,6 +119,11 @@ public class Goods extends Components {
     }
 
     @Override
+    public double getValue() {
+        return price*quantity;
+    }
+
+    @Override
     public BaoList getInnerList() {
         return null;
     }

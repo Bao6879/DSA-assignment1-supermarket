@@ -583,7 +583,9 @@ public class CliController {
     @FXML
     private void backAction(ActionEvent event) {
         if (pos==null) {
-            mainApp.switchScene();
+            mainApp.switchScene("model");
+            mainApp.modelViewController.baoList=baoList;
+            mainApp.modelViewController.populateTree();
             return;
         }
         boolean isSearch=false;

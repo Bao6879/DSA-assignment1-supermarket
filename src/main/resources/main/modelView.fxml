@@ -9,6 +9,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
@@ -132,25 +133,6 @@
                                                       </Label>
                                                    </children>
                                                 </AnchorPane>
-                                                <AnchorPane fx:id="smartAdd" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
-                                                   <children>
-                                                      <Button fx:id="smartAddButton" layoutX="882.0" layoutY="62.0" mnemonicParsing="false" onAction="#smartAdd" prefHeight="46.0" prefWidth="172.0" text="Add Smartly!">
-                                                         <font>
-                                                            <Font size="15.0" />
-                                                         </font>
-                                                      </Button>
-                                                      <TextField fx:id="searchField1" layoutX="92.0" layoutY="62.0" prefHeight="46.0" prefWidth="258.0" promptText="s">
-                                                         <font>
-                                                            <Font size="15.0" />
-                                                         </font>
-                                                      </TextField>
-                                                      <Label alignment="CENTER" layoutX="332.0" prefHeight="18.0" prefWidth="503.0" text="Add an item smartly!">
-                                                         <font>
-                                                            <Font size="30.0" />
-                                                         </font>
-                                                      </Label>
-                                                   </children>
-                                                </AnchorPane>
                                                 <AnchorPane fx:id="action" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="1054.0" visible="false">
                                                    <children>
                                                       <Label fx:id="actionLabel" alignment="CENTER" layoutX="44.0" prefHeight="46.0" prefWidth="956.0" text="What do you want to do?">
@@ -244,6 +226,51 @@
                                                       </Label>
                                                    </children>
                                                 </AnchorPane>
+                                                <AnchorPane fx:id="smartAdd" minHeight="0.0" minWidth="0.0" prefHeight="266.0" prefWidth="1054.0" visible="false">
+                                                   <children>
+                                                      <Button layoutX="968.0" layoutY="62.0" mnemonicParsing="false" onAction="#smartAdd" prefHeight="46.0" prefWidth="172.0" text="Add Smartly!">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <TextField fx:id="smartAddName" layoutX="14.0" layoutY="8.0" prefHeight="46.0" prefWidth="265.0" promptText="Name of the item">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label alignment="CENTER" layoutX="304.0" layoutY="8.0" prefHeight="18.0" prefWidth="503.0" text="Add a goods item smartly!">
+                                                         <font>
+                                                            <Font size="30.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <ChoiceBox fx:id="smartAddTemperature" layoutX="737.0" layoutY="8.0" prefHeight="46.0" prefWidth="205.0" />
+                                                      <TextField fx:id="smartAddImage" layoutX="572.0" layoutY="62.0" prefHeight="46.0" prefWidth="377.0" promptText="Image URL">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="smartAddPrice" layoutX="996.0" layoutY="8.0" prefHeight="46.0" prefWidth="135.0" promptText="Price">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="smartAddQuantity" layoutX="303.0" layoutY="8.0" prefHeight="46.0" prefWidth="98.0" promptText="Quantity">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="smartAddWeight" layoutX="434.0" layoutY="62.0" prefHeight="46.0" prefWidth="122.0" promptText="Weight">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <TextField fx:id="smartAddDescription" layoutX="14.0" layoutY="62.0" prefHeight="46.0" prefWidth="390.0" promptText="Description of the item">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </TextField>
+                                                   </children>
+                                                </AnchorPane>
                                              </children>
                                           </StackPane>
                                        </content>
@@ -277,7 +304,7 @@
                                                 <Cursor fx:constant="HAND" />
                                              </cursor>
                                           </ScrollPane>
-                                          <AnchorPane fx:id="searchResult" disable="true" prefHeight="200.0" prefWidth="200.0">
+                                          <AnchorPane fx:id="searchResult" disable="true" prefHeight="200.0" prefWidth="200.0" visible="false">
                                              <children>
                                                 <ListView fx:id="listView" layoutX="143.0" layoutY="90.0" prefHeight="508.0" prefWidth="1076.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                              </children>
@@ -296,11 +323,22 @@
          <top>
             <MenuBar BorderPane.alignment="CENTER">
               <menus>
-                <Menu mnemonicParsing="false" text="Save" />
-                <Menu mnemonicParsing="false" text="Load" />
-                <Menu mnemonicParsing="false" text="Reset" />
-                  <Menu mnemonicParsing="false" text="View All" />
-                  <Menu mnemonicParsing="false" text="Switch View" />
+                <Menu mnemonicParsing="false" text="Themes">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Nothing here" />
+                     </items></Menu>
+                <Menu mnemonicParsing="false" text="Persistence">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#saveData" text="Save" />
+                        <MenuItem mnemonicParsing="false" onAction="#loadData" text="Load" />
+                        <MenuItem mnemonicParsing="false" onAction="#resetData" text="Reset" />
+                     </items></Menu>
+                <Menu mnemonicParsing="false" text="Switch Views">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#cli" text="CLI view" />
+                        <MenuItem mnemonicParsing="false" onAction="#viewAll" text="View All" />
+                        <MenuItem mnemonicParsing="false" text="Model View" />
+                     </items></Menu>
               </menus>
             </MenuBar>
          </top>

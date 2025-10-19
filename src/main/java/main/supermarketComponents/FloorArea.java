@@ -49,6 +49,14 @@ public class FloorArea extends Components {
         return 0;
     }
 
+    @Override
+    public double getValue() {
+        double value=0.0;
+        for (Aisle aisle : aisles)
+            value+=aisle.getValue();
+        return value;
+    }
+
     public Aisle findAisle(Aisle aisle) {
         for (Aisle a : aisles) {
             if (a == aisle)

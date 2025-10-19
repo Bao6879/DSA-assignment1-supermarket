@@ -63,6 +63,14 @@ public class Aisle extends Components{
     }
 
     @Override
+    public double getValue() {
+        double value=0.0;
+        for (Shelf shelf : shelves)
+            value+=shelf.getValue();
+        return value;
+    }
+
+    @Override
     public double similarScore(Components other) {
         if (other==null)
             return Double.MAX_VALUE-1;
