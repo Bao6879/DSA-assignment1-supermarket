@@ -83,7 +83,7 @@ public class Goods extends Components {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Goods goods = (Goods) o;
-        return Double.compare(price, goods.price) == 0 && Double.compare(weight, goods.weight) == 0 && Objects.equals(temperature, goods.temperature) && Objects.equals(description, goods.description) && Objects.equals(name, goods.name) && Objects.equals(imageUrl, goods.imageUrl);
+        return Objects.equals(name, goods.name);
     }
 
     @Override

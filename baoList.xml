@@ -3,69 +3,133 @@
     <head>
       <depth>0</depth>
       <content class="main.supermarketComponents.FloorArea">
-        <name>bao</name>
+        <name>food</name>
         <level>1</level>
         <aisles>
           <head>
-            <depth>1</depth>
-            <content class="main.supermarketComponents.Aisle">
-              <name>bao</name>
-              <length>1.0</length>
-              <width>1.0</width>
-              <temperature>1.0</temperature>
-              <shelves>
-                <head>
-                  <depth>2</depth>
-                  <content class="main.supermarketComponents.Shelf">
-                    <number>10</number>
-                    <goods>
-                      <head>
-                        <next>
-                          <next>
-                            <prev reference="../.."/>
+            <next>
+              <next>
+                <prev reference="../.."/>
+                <depth>1</depth>
+                <content class="main.supermarketComponents.Aisle">
+                  <name>frozen</name>
+                  <temperature>Frozen</temperature>
+                  <length>1.0</length>
+                  <width>1.0</width>
+                  <shelves>
+                    <head>
+                      <depth>2</depth>
+                      <content class="main.supermarketComponents.Shelf">
+                        <number>1</number>
+                        <goods>
+                          <head>
                             <depth>3</depth>
                             <content class="main.supermarketComponents.Goods">
-                              <description>super mao</description>
-                              <name>lao</name>
-                              <price>10.0</price>
-                              <weight>15.0</weight>
-                              <temperature>30.0</temperature>
-                              <quantity>10</quantity>
-                              <imageUrl>random</imageUrl>
+                              <description>Delicious frozen fish fillet</description>
+                              <name>Fish fillet</name>
+                              <temperature>Frozen</temperature>
+                              <price>1.0</price>
+                              <weight>1.0</weight>
+                              <quantity>1</quantity>
+                              <imageUrl>1</imageUrl>
                             </content>
-                          </next>
-                          <prev reference="../.."/>
+                          </head>
+                          <size>1</size>
+                        </goods>
+                      </content>
+                    </head>
+                    <size>1</size>
+                  </shelves>
+                </content>
+              </next>
+              <prev reference="../.."/>
+              <depth>1</depth>
+              <content class="main.supermarketComponents.Aisle">
+                <name>cold</name>
+                <temperature>Refrigerated</temperature>
+                <length>1.0</length>
+                <width>1.0</width>
+                <shelves>
+                  <head>
+                    <depth>2</depth>
+                    <content class="main.supermarketComponents.Shelf">
+                      <number>1</number>
+                      <goods>
+                        <head>
                           <depth>3</depth>
                           <content class="main.supermarketComponents.Goods">
-                            <description>ultra lmao</description>
-                            <name>lmao</name>
-                            <price>11.0</price>
-                            <weight>10.0</weight>
-                            <temperature>20.0</temperature>
-                            <quantity>10</quantity>
-                            <imageUrl>randomurl1</imageUrl>
+                            <description>Drink more to be strong</description>
+                            <name>Milk</name>
+                            <temperature>Refrigerated</temperature>
+                            <price>1.0</price>
+                            <weight>1.0</weight>
+                            <quantity>1</quantity>
+                            <imageUrl>1</imageUrl>
                           </content>
-                        </next>
+                        </head>
+                        <size>1</size>
+                      </goods>
+                    </content>
+                  </head>
+                  <size>1</size>
+                </shelves>
+              </content>
+            </next>
+            <depth>1</depth>
+            <content class="main.supermarketComponents.Aisle">
+              <name>normal</name>
+              <temperature>Unrefrigerated</temperature>
+              <length>1.0</length>
+              <width>1.0</width>
+              <shelves>
+                <head>
+                  <next>
+                    <prev reference="../.."/>
+                    <depth>2</depth>
+                    <content class="main.supermarketComponents.Shelf">
+                      <number>2</number>
+                      <goods>
+                        <head>
+                          <depth>3</depth>
+                          <content class="main.supermarketComponents.Goods">
+                            <description>Suitable for small toys</description>
+                            <name>AA Battery</name>
+                            <temperature>Unrefrigerated</temperature>
+                            <price>1.0</price>
+                            <weight>1.0</weight>
+                            <quantity>1</quantity>
+                            <imageUrl>1</imageUrl>
+                          </content>
+                        </head>
+                        <size>1</size>
+                      </goods>
+                    </content>
+                  </next>
+                  <depth>2</depth>
+                  <content class="main.supermarketComponents.Shelf">
+                    <number>1</number>
+                    <goods>
+                      <head>
                         <depth>3</depth>
                         <content class="main.supermarketComponents.Goods">
-                          <description>super lmao</description>
-                          <name>lmao</name>
+                          <description>Mops the floor</description>
+                          <name>Mop</name>
+                          <temperature>Unrefrigerated</temperature>
                           <price>10.0</price>
-                          <weight>10.0</weight>
-                          <temperature>10.0</temperature>
-                          <quantity>10</quantity>
-                          <imageUrl>randomurl</imageUrl>
+                          <weight>100.0</weight>
+                          <quantity>1</quantity>
+                          <imageUrl>1</imageUrl>
                         </content>
                       </head>
-                      <size>3</size>
+                      <size>1</size>
                     </goods>
                   </content>
                 </head>
-                <size>1</size>
+                <size>2</size>
               </shelves>
             </content>
           </head>
-          <size>1</size>
+          <size>3</size>
         </aisles>
       </content>
     </head>

@@ -2,6 +2,7 @@ package main;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -27,10 +28,11 @@ public class ModelViewController {
 
     //Back end
     public BaoList<FloorArea> baoList=new BaoList<>();
-    private BaoList currentPath=new BaoList();
+    private BaoList currentPath=new BaoList(), newPath=new BaoList();
     private BaoNode considering;
     private MainApplication mainApp;
-    private boolean inSearch=false;
+    private boolean inSearch=false, animating=false;
+    private AnimationTimer currentAnimation=null;
 
     //General
     public TreeView <String> treeView=new TreeView<>();
@@ -90,23 +92,76 @@ public class ModelViewController {
 
         smartAddTemperature.getItems().addAll("Unrefrigerated", "Refrigerated", "Frozen");
         smartAddTemperature.getSelectionModel().selectFirst();
+
+        treeView.setOnMouseClicked(event -> {
+            BaoList <String> clicked=new BaoList();
+            TreeItem <String> selected=treeView.getSelectionModel().getSelectedItem();
+            if (selected==null)
+                return;
+            TreeItem <String> current=selected;
+            while (current!=null) {
+                String value=current.getValue();
+                if (current.getValue().startsWith("Floor area: "))
+                    value=value.substring(12);
+                else if (current.getValue().startsWith("Aisle: "))
+                    value=value.substring(7);
+                else if (current.getValue().startsWith("Shelf: "))
+                    value=value.substring(7);
+                clicked.addNode(value);
+                current=current.getParent();
+            }
+            String source="";
+            switch (currentPath.getSize())
+            {
+                case 0 -> source="floorArea";
+                case 1 -> source="aisle";
+                case 2 -> source="shelf";
+                case 3 -> source="goods";
+            }
+            newPath.clear();
+            if (clicked.getSize()==1)
+            {
+                drawTransition(source, "floorArea", "change");
+            }
+            else if (clicked.getSize()==2)
+            {
+                newPath.addNode(baoList.searchNode(new FloorArea(clicked.getNode(0).getContent(), 1)));
+                drawTransition(source, "aisle", "change");
+            }
+            else if (clicked.getSize()==3)
+            {
+                FloorArea tmp=baoList.searchNode(new FloorArea(clicked.getNode(1).getContent(), 1)).getContent();
+                newPath.addNode(tmp);
+                newPath.addNode(tmp.getInnerList().searchNode(new Aisle(clicked.getNode(0).getContent(), 1, 1, "")));
+                drawTransition(source, "shelf", "change");
+            }
+            else
+            {
+                FloorArea tmp=baoList.searchNode(new FloorArea(clicked.getNode(clicked.getSize()-2).getContent(), 1)).getContent();
+                newPath.addNode(tmp);
+                Aisle temp=tmp.getInnerList().searchNode(new Aisle(clicked.getNode(clicked.getSize()-3).getContent(), 1, 1, "")).getContent();
+                newPath.addNode(temp);
+                newPath.addNode(temp.getInnerList().searchNode(new Shelf(Integer.parseInt(clicked.getNode(clicked.getSize()-4).getContent()))).getContent());
+                drawTransition(source, "shelf", "change");
+            }
+        });
     }
 
     public void populateTree(){
         TreeItem<String> root = new TreeItem<>("Hypermarket");
         root.setExpanded(true);
         for (FloorArea area : baoList){
-            TreeItem<String> floorItem = new TreeItem<>(area.getName());
+            TreeItem<String> floorItem = new TreeItem<>("Floor area: "+area.getName());
             if (currentPath.getSize()>=1 && area.equals(currentPath.getNode(0).getContent()))
                 floorItem.setExpanded(true);
             for (Aisle aisle: area.getInnerList())
             {
-                TreeItem<String> aisleItem = new TreeItem<>(aisle.getName());
+                TreeItem<String> aisleItem = new TreeItem<>("Aisle: "+aisle.getName());
                 if (currentPath.getSize()>=2 && aisle.equals(currentPath.getNode(1).getContent()))
                     aisleItem.setExpanded(true);
                 for (Shelf shelf: aisle.getInnerList())
                 {
-                    TreeItem<String> shelfItem = new TreeItem<>(shelf.getNumber()+"");
+                    TreeItem<String> shelfItem = new TreeItem<>("Shelf: "+shelf.getNumber());
                     if (currentPath.getSize()>=3 && shelf.equals(currentPath.getNode(2).getContent()))
                         shelfItem.setExpanded(true);
                     for (Goods goods: shelf.getInnerList())
@@ -208,16 +263,19 @@ public class ModelViewController {
         if (currentPath.getSize()==0)
         {
             currentPath.addNode(considering);
+            drawTransition("floorArea", "aisle", "");
             showAisles();
         }
         else if (currentPath.getSize()==1)
         {
             currentPath.addNode(considering);
+            drawTransition("aisle", "shelf", "");
             showShelves();
         }
         else if (currentPath.getSize()==2)
         {
             currentPath.addNode(considering);
+            drawTransition("shelf", "goods", "");
             showGoods();
         }
         else if (currentPath.getSize()==3)
@@ -238,12 +296,12 @@ public class ModelViewController {
             BaoNode temp=((Components)findNodeByPath(currentPath, currentPath.getNode(2)).getContent()).getInnerList().searchNode(considering);
             String count=deleteCount.getText().trim();
             if (!Utilities.checkStringInvalidInteger(count, comment)) {
-                if (((Goods) temp.getContent()).getQuantity() <Integer.parseInt(count)) {
+                if (((Goods) temp.getContent()).getQuantity()<=Integer.parseInt(count)) {
                     ((Components) findNodeByPath(currentPath, currentPath.getNode(2)).getContent()).getInnerList().removeNode(considering);
                     comment.setText("Deletion Successful!");
                 }
                 else {
-                    ((Goods) temp.getContent()).setQuantity(Integer.parseInt(count) + ((Goods) temp.getContent()).getQuantity());
+                    ((Goods) temp.getContent()).setQuantity(Integer.parseInt(count) - ((Goods) temp.getContent()).getQuantity());
                     comment.setText("Removed "+count+" items!");
                 }
             }
@@ -277,23 +335,13 @@ public class ModelViewController {
             comment.setText("There is no higher place to go to.");
             return;
         }
-        if (!inSearch)
-            currentPath.removeNode(currentPath.getNode(currentPath.getSize()-1));
-        else {
-            inSearch = false;
-            searchResult.setDisable(true);
-            searchResult.setVisible(false);
-            canvasPane.setDisable(false);
-            canvasPane.setVisible(true);
+        if (!inSearch) {
+            switch (currentPath.getSize()) {
+                case 1 -> drawTransition("aisle", "floorArea", "delete");
+                case 2 -> drawTransition("shelf", "aisle", "delete");
+                case 3 -> drawTransition("goods", "aisle", "delete");
+            }
         }
-        switch (currentPath.getSize())
-        {
-            case 0 -> showFloorAreas();
-            case 1 -> showAisles();
-            case 2 -> showShelves();
-            case 3 -> showGoods();
-        }
-        populateTree();
     }
 
     public void addView()
@@ -442,6 +490,7 @@ public class ModelViewController {
             BaoList optimalPlacement=new BaoList<>();
             int maxNameMatches=-1, maxDescriptionMatches=-1;
             double minPriceDifference=Double.MAX_VALUE, minWeightDifference=Double.MAX_VALUE;
+            Utilities.createSkippedWords();
             for (FloorArea area: baoList) {
                 for (Aisle aisle : area.getInnerList()) {
                     if (aisle.getTemperature().equals(temperature)) {
@@ -521,6 +570,7 @@ public class ModelViewController {
                 ((Components)findNodeByPath(defaultPlacement, defaultPlacement.getNode(2)).getContent()).getInnerList().addNode(new BaoNode(item));
                 comment.setText("Didn't find a suitable place, so item has been added to shelf "+((Components)defaultPlacement.getNode(2).getContent()).getName()+" of aisle "+((Components)defaultPlacement.getNode(1).getContent()).getName()+" of floor area "+((Components)defaultPlacement.getNode(0).getContent()).getName()+"!");
             }
+            populateTree();
         }
     }
 
@@ -538,6 +588,7 @@ public class ModelViewController {
                 j++;
             }
             i=j;
+            tmp=tmp.toLowerCase();
             if (!Utilities.skippedWords.contains(tmp) && !tokens.contains(tmp))
             {
                 tokens.addNode(tmp);
@@ -650,22 +701,105 @@ public class ModelViewController {
     }
 
     ///Drawing
+    private void stopAnimation()
+    {
+        if (currentAnimation!=null)
+            currentAnimation.stop();
+        currentAnimation=null;
+    }
+
+    public void drawTransition(String source, String dest, String after)
+    {
+        stopAnimation();
+        animating=true;
+        if (after.equals("change"))
+            if (newPath.getSize()>=currentPath.getSize())
+                currentPath=Utilities.copyList(newPath);
+        currentAnimation=new AnimationTimer() {
+            private long startTime=0;
+
+            @Override
+            public void handle(long now) {
+                if (startTime==0)
+                    startTime=now;
+                double elapsedSeconds = (now-startTime)/1e9;
+                int sta= (int) ((canvas.getWidth()+20)*elapsedSeconds/0.25);
+                boolean finishedSource = false;
+                if (elapsedSeconds>=0.25)
+                    finishedSource = true;
+                if (elapsedSeconds>0.5) {
+                    animating=false;
+                    stop();
+                    if (after.equals("delete"))
+                    {
+                        if (!inSearch)
+                            currentPath.removeNode(currentPath.getNode(currentPath.getSize() - 1));
+                        else {
+                            inSearch = false;
+                            searchResult.setDisable(true);
+                            searchResult.setVisible(false);
+                            canvasPane.setDisable(false);
+                            canvasPane.setVisible(true);
+                        }
+                        switch (currentPath.getSize()) {
+                            case 0 -> showFloorAreas();
+                            case 1 -> showAisles();
+                            case 2 -> showShelves();
+                            case 3 -> showGoods();
+                        }
+                        populateTree();
+                    }
+                    else if (after.equals("change"))
+                    {
+                        currentPath=Utilities.copyList(newPath);
+                        switch (currentPath.getSize())
+                        {
+                            case 0 -> showFloorAreas();
+                            case 1 -> showAisles();
+                            case 2 -> showShelves();
+                            case 3 -> showGoods();
+                        }
+                        populateTree();
+                    }
+                    return;
+                }
+                gc.setFill(Color.WHITE);
+                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                if (!finishedSource)
+                    switch (source) {
+                        case "floorArea" -> drawFloorAreas(20 - sta);
+                        case "aisle" -> drawAisles(20 - sta);
+                        case "shelf" -> drawShelves(20 - sta);
+                        case "goods" -> drawGoods(20 - sta);
+                    }
+                else
+                    switch (dest) {
+                        case "floorArea" -> drawFloorAreas((int) (sta-2*canvas.getWidth()-20));
+                        case "aisle" -> drawAisles((int) (sta-2*canvas.getWidth()-20));
+                        case "shelf" -> drawShelves((int) (sta-2*canvas.getWidth()-20));
+                        case "goods" -> drawGoods((int) (sta-2*canvas.getWidth()-20));
+                    }
+            }
+        };
+        currentAnimation.start();
+    }
+
     public void draw()
     {
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         switch (currentPath.getSize())
         {
-            case 0 -> drawFloorAreas();
-            case 1 -> drawAisles();
-            case 2 -> drawShelves();
-            case 3 -> drawGoods();
+            case 0 -> drawFloorAreas(20);
+            case 1 -> drawAisles(20);
+            case 2 -> drawShelves(20);
+            case 3 -> drawGoods(20);
         }
     }
 
-    private void drawFloorAreas()
+    private void drawFloorAreas(int xStart)
     {
-        int xPos=20, yPos=20;
+        int xPos=xStart, yPos=20;
         gc.setTextAlign(TextAlignment.CENTER);
         for (FloorArea area : baoList)
         {
@@ -678,16 +812,16 @@ public class ModelViewController {
             xPos+=floorAreaSize+20;
             if (xPos>=canvas.getWidth())
             {
-                xPos=20;
+                xPos=xStart;
                 yPos+=floorAreaSize+20;
             }
             //TODO: compute multi line names
         }
     }
 
-    private void drawAisles()
+    private void drawAisles(int xStart)
     {
-        int xPos=20, yPos=20;
+        int xPos=xStart, yPos=20;
         gc.setTextAlign(TextAlignment.CENTER);
         for (Object aisle: ((Components)currentPath.getNode(0).getContent()).getInnerList())
         {
@@ -700,16 +834,16 @@ public class ModelViewController {
             xPos+=aisleBoxLength+20;
             if (xPos>=canvas.getWidth())
             {
-                xPos=20;
+                xPos=xStart;
                 yPos+=aisleBoxWidth+20;
             }
             //TODO: compute multi line names
         }
     }
 
-    private void drawShelves()
+    private void drawShelves(int xStart)
     {
-        int xPos=20, yPos=20;
+        int xPos=xStart, yPos=20;
         gc.setTextAlign(TextAlignment.CENTER);
         for (Object shelf: ((Components)currentPath.getNode(1).getContent()).getInnerList())
         {
@@ -722,16 +856,16 @@ public class ModelViewController {
             xPos+=shelfLength+20;
             if (xPos>=canvas.getWidth())
             {
-                xPos=20;
+                xPos=xStart;
                 yPos+=shelfWidth+20;
             }
             //TODO: compute multi line names
         }
     }
 
-    private void drawGoods()
+    private void drawGoods(int xStart)
     {
-        int xPos=20, yPos=20;
+        int xPos=xStart, yPos=20;
         gc.setTextAlign(TextAlignment.CENTER);
         for (Object goods: ((Components)currentPath.getNode(2).getContent()).getInnerList())
         {
@@ -744,7 +878,7 @@ public class ModelViewController {
             xPos+=goodsSize+20;
             if (xPos>=canvas.getWidth())
             {
-                xPos=20;
+                xPos=xStart;
                 yPos+=goodsSize+20;
             }
             //TODO: compute multi line names

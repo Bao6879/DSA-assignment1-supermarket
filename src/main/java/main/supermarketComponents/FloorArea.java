@@ -101,6 +101,6 @@ public class FloorArea extends Components {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FloorArea floorArea = (FloorArea) o;
-        return level == floorArea.level && Objects.equals(name, floorArea.name);
+        return Objects.equals(name, floorArea.name);
     }
 }

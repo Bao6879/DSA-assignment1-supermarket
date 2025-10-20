@@ -38,7 +38,7 @@ public class MainApplication extends Application {
         view = new Scene(viewAll, 1080, 720);
         MainApplication.stage = stage;
         stage.setTitle("CLI VIEW");
-        stage.setFullScreen(true);
+//        stage.setFullScreen(true);
         stage.setScene(cli);
         stage.show();
     }
@@ -50,7 +50,7 @@ public class MainApplication extends Application {
     public void switchScene(String destination) {
         if (destination.equals("model")) {
             stage.setScene(model);
-            stage.setFullScreen(true);
+//            stage.setFullScreen(true);
         }
         else if (destination.equals("view")) {
             stage.setScene(view);
